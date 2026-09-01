@@ -1,0 +1,117 @@
+
+Yassini Jacquerel JOSOA
+Développeur PHP Senior (+6 ans) | Architecte Laravel & Expert
+Python IA Spécialiste en solutions SaaS, IA Générative et Écosystèmes Mobiles Scalables	Nosy-Be, Madagascar
++261 32 55 268 02
+josoayassinijacquerel@gmail.com LinkedIn : @yassini-jacquerel-josoa GitHub : @yassini-jacquerel-josoa
+
+
+RÉSUMÉ PROFESSIONNEL
+Développeur PHP Senior avec plus de 6 ans d’expérience, spécialisé en architecture logicielle, Laravel et développement de produits web à forte valeur métier. J’interviens sur des projets complexes, from scratch ou en reprise d’existant, avec une approche centrée sur la robustesse, la maintenabilité et la qualité du code. À l’aise dans les environnements mêlant PHP, Python et IA appliquée, je conçois des solutions concrètes intégrant automatisation, orchestration de services et expérience utilisateur ﬂuide.
+
+EXPÉRIENCES PROFESSIONNELLES
+
+Responsable d’Équipe & Développeur Full-Stack Senior Alsasoft Madagascar – Nosy-Be
+
+Mars 2023 – Présent (3 ans) *
+
+    • Architecture & Ingénierie PHP (Expert) : Conception d'architectures PHP 8.2 hautement robustes et évolutives basées sur les principes SOLID, DDD (Domain-Driven Design) et le pattern MVC. Mise en place de contrats d'interfaces rigoureux pour garantir un code découplé, testable et facilement maintenable.
+    • Intelligence Artiﬁcielle : Conception d'agents autonomes via LangChain et LangGraph. Développement de systèmes RAG (Retrieval-Augmented Generation) pour l'analyse documentaire et l'automatisation de tâches métier via l'API OpenAI.
+    • Développement Mobile : Conception et mise en production d’applications mobiles avec React Native (Expo), intégration de Firebase (Firestore/Auth), notiﬁcations push via OneSignal, abonnements in-app avec RevenueCat, ainsi que gestion du cycle de publication sur les stores. Participation à la publication sur Google Play Store et Apple App Store, notamment sur MyRacingCoach.
+    • Leadership : Gestion d'une équipe de 4 développeurs, revues de code rigoureuses, mentorat technique et pilotage des sprints en méthodologie Agile/Scrum.
+    • Interventions sur plusieurs produits web, mobile et back-office, parmi lesquels Wondergeorge, My Racing Coach (API, mobile, backoffice, web app), Soipakon (web et mobile), Fixebo (web et mobile), MakeMeUp (mobile et administration), BDE (web et mobile), Sunextend, EFT et wg-editor.
+
+Succès & Valeur Ajoutée : J’ai servi de pilier technique sur plusieurs projets en combinant vision d’architecture, polyvalence opérationnelle et montée en qualité du code. Mon apport a porté sur la structuration des projets, l’introduction de standards plus robustes de développement et la prise en charge de sujets complexes mêlant Laravel, IA et mobile, dans un contexte multi-projets au sein d’une équipe de 5 développeurs.
+Yassini Jacquerel JOSOA
+Développeur PHP Senior (+6 ans) | Architecte Laravel & Expert
+Python IA Spécialiste en solutions SaaS, IA Générative et Écosystèmes Mobiles Scalables	Nosy-Be, Madagascar
++261 32 55 268 02
+josoayassinijacquerel@gmail.com LinkedIn : @yassini-jacquerel-josoa GitHub : @yassini-jacquerel-josoa
+
+
+RÉSUMÉ PROFESSIONNEL
+Développeur PHP Senior avec plus de 6 ans d’expérience, spécialisé en architecture logicielle, Laravel et développement de produits web à forte valeur métier. J’interviens sur des projets complexes, from scratch ou en reprise d’existant, avec une approche centrée sur la robustesse, la maintenabilité et la qualité du code. À l’aise dans les environnements mêlant PHP, Python et IA appliquée, je conçois des solutions concrètes intégrant automatisation, orchestration de services et expérience utilisateur ﬂuide.
+
+EXPÉRIENCES PROFESSIONNELLES
+
+Responsable d’Équipe & Développeur Full-Stack Senior Alsasoft Madagascar – Nosy-Be
+
+Mars 2023 – Présent (3 ans) *
+
+    • Architecture & Ingénierie PHP (Expert) : Conception d'architectures PHP 8.2 hautement robustes et évolutives basées sur les principes SOLID, DDD (Domain-Driven Design) et le pattern MVC. Mise en place de contrats d'interfaces rigoureux pour garantir un code découplé, testable et facilement maintenable.
+    • Intelligence Artiﬁcielle : Conception d'agents autonomes via LangChain et LangGraph. Développement de systèmes RAG (Retrieval-Augmented Generation) pour l'analyse documentaire et l'automatisation de tâches métier via l'API OpenAI.
+    • Développement Mobile : Conception et mise en production d’applications mobiles avec React Native (Expo), intégration de Firebase (Firestore/Auth), notiﬁcations push via OneSignal, abonnements in-app avec RevenueCat, ainsi que gestion du cycle de publication sur les stores. Participation à la publication sur Google Play Store et Apple App Store, notamment sur MyRacingCoach.
+    • Leadership : Gestion d'une équipe de 4 développeurs, revues de code rigoureuses, mentorat technique et pilotage des sprints en méthodologie Agile/Scrum.
+    • Interventions sur plusieurs produits web, mobile et back-office, parmi lesquels Wondergeorge, My Racing Coach (API, mobile, backoffice, web app), Soipakon (web et mobile), Fixebo (web et mobile), MakeMeUp (mobile et administration), BDE (web et mobile), Sunextend, EFT et wg-editor.
+
+Succès & Valeur Ajoutée : J’ai servi de pilier technique sur plusieurs projets en combinant vision d’architecture, polyvalence opérationnelle et montée en qualité du code. Mon apport a porté sur la structuration des projets, l’introduction de standards plus robustes de développement et la prise en charge de sujets complexes mêlant Laravel, IA et mobile, dans un contexte multi-projets au sein d’une équipe de 5 développeurs.
+Développeur Web Full-Stack PHP (Vanilla) Magic-Net – Antsiranana
+
+Mars 2020 – Février 2021
+
+    • Ingénierie PHP Natif (Pure PHP) : Refonte intégrale des modules critiques de gestion universitaire (notes, inscriptions, plannings) en PHP pur. Développement d'une architecture modulaire personnalisée pour garantir la sécurité et la rapidité d'exécution sans les surcharges d'un framework.
+    • Modernisation & Architecture Data : Migration de bases de données legacy obsolètes vers des structures MySQL optimisées. Conception de schémas de données performants et sécurisation des entrées (PDO, Prepared Statements) contre les failles SQL.
+    • Optimisation des Performances : Analyse et réécriture des algorithmes de calcul de moyennes et de gestion des ﬂux d'inscriptions. Réduction drastique de la consommation CPU et mémoire du serveur.
+    • UX/UI & Front-end : Implémentation d'interfaces réactives et ﬂuides en JavaScript/AJAX, améliorant l'expérience utilisateur sur desktop et tablettes pour les étudiants et l'administration.
+
+Succès & Valeur Ajoutée : J’ai contribué à rendre un système métier critique plus rapide, plus lisible et plus maintenable grâce à une refonte ciblée de modules sensibles en PHP natif, notamment sur la gestion des notes. Cette expérience démontre ma capacité à reprendre un existant, diagnostiquer les points faibles et livrer des améliorations concrètes sur des outils déjà utilisés au quotidien.
+
+Stage de Mémoire – Développeur Full-Stack - MADA-Digital – Antsiranana
+
+Octobre 2022 – Décembre 2022:
+
+    • Conception et développement complet d’une base de données pour la gestion pharmaceutique (stockage d’informations médicales).
+    • Intégration d’un système de gestion des stocks et des commandes en temps réel.
+    • Rédaction d’un mémoire technique détaillé et formation des utilisateurs ﬁnaux.
+
+Succès & Valeur Ajoutée : Cette mission a renforcé ma capacité à traduire un besoin métier concret en solution exploitable, en combinant structuration des données, compréhension fonctionnelle et attention portée à l’utilisateur ﬁnal. Elle m’a aussi permis de progresser dans la communication directe avec le client et dans la qualité d’interprétation du besoin.
+
+
+SÉLECTION DE PROJETS MAJEURS
+Wondergeorge – SaaS de Création de Sites par IA Rôle : Lead Développeur (2023-2024) Stack : Laravel, Livewire, Python (FastAPI), LangChain, MySQL.
+
+    • Moteur de Génération : Développement d'un algorithme capable de structurer, rédiger et designer un site web complet en moins de 45 secondes.
+    • IA Multilingue : Système de traduction automatique de sites entiers conservant le contexte métier et le ton de marque.
+    • Marketing Automatisé : Module "Blogging IA" publiant de manière autonome des articles optimisés pour le SEO (Google/Bing).
+
+Succès & Valeur Ajoutée : En tant que lead développeur, j’ai pris en charge les déﬁs d’architecture les plus complexes du produit, en particulier l’orchestration entre Laravel, Python et les traitements IA, avec un travail fort sur la réduction de la latence et la ﬂuidité de génération. Mon apport a contribué à transformer une mécanique technique lourde en expérience produit simple, multilingue et commercialement différenciante.
+
+SmartBots – Assistant Multi-Services IA Rôle : Lead Développeur / Freelance (Projet externe en collaboration avec une société de développement) Stack : React Native, LangChain, LangGraph, Google/Microsoft Graph APIs, OAuth2.
+
+    • Pilotage Technique : Projet externe réalisé avec l’appui de deux développeurs fournis par une société partenaire, avec prise en charge du rôle de lead sur la structuration et les choix techniques majeurs.
+    • Fondations Produit : Structuration de la base du projet côté front-end et back-end aﬁn de poser une architecture claire, évolutive et adaptée à un assistant IA multi-services.
+    • Backend & Orchestration : Développement du cœur backend, avec mise en place de l’orchestrateur principal gérant les chatbots, les enchaînements d’actions et la logique générative.
+    • Observabilité IA : Intégration d’un mécanisme de visualisation et de replay des traitements LangGraph pour mieux suivre, comprendre et ﬁabiliser les exécutions.
+    • Plugins & Connecteurs : Mise en place des bases d’intégration pour les services web search, LinkedIn et calendriers Google/Microsoft dans une logique d’extension modulaire.
+    • Sécurité Applicative : Validation humaine sur les actions critiques pour conserver le contrôle sur les opérations sensibles.
+
+Succès & Valeur Ajoutée : Ce projet met en avant ma capacité à prendre le leadership technique sur un assistant IA complexe en structurant ses fondations, son orchestrateur backend et sa logique de plugins connectés. Il renforce mon positionnement sur les architectures IA appliquées, l’orchestration LangGraph et la conception de produits intelligents réellement extensibles.
+
+MyRacingCoach – Plateforme de coaching karting & pilotage amateur Rôle : Développeur Full-Stack Stack : Next.js, React Native (Expo), Laravel, TypeScript, OpenAI API, Firebase.
+
+    • Backoffice & Administration : Développement de l’interface d’administration avec Next.js pour offrir un environnement rapide, structuré et maintenable, pensé pour la gestion ﬂuide des données, des contenus et des usages métier.
+    • Application Mobile : Contribution au développement de l’application mobile destinée aux pilotes amateurs, avec une expérience orientée simplicité, performance et exploitation concrète des fonctionnalités de coaching.
+    • IA de Conseil : Intégration d’une composante IA côté backend, utilisée directement dans l’application sous forme de chatbot de conseil, aﬁn d’aider les utilisateurs à mieux interpréter leurs performances et à améliorer leur score.
+    • Cas d’usage Métier : La solution s’adresse aux amateurs de karting et de pilotage type F1 amateur, avec des
+recommandations contextualisées pour accompagner la progression, l’analyse de conduite et l’amélioration continue.
+    • Publication Mobile : Participation à la mise en ligne de l’application sur Google Play Store et Apple App Store, notamment dans le cadre de l’écosystème MyRacingCoach.
+
+Succès & Valeur Ajoutée : Ce projet démontre ma capacité à concevoir un produit full-stack cohérent combinant backoffice métier, application mobile et intelligence artiﬁcielle appliquée à un usage concret. Il illustre aussi ma capacité à relier plusieurs briques techniques dans une logique produit claire, avec un souci de performance, de maintenabilité et d’utilité réelle pour l’utilisateur ﬁnal.
+
+
+COMPÉTENCES TECHNIQUES DÉTAILLÉES
+    • Langages	&	Frameworks	:	PHP	8+	(Expert), Laravel (Expert), Python (Intermédiaire/Avancé), JavaScript/TypeScript.
+    • Espace IA : LangChain, LangGraph, Prompt Engineering, FastAPI, Pinecone, OpenAI API, Whisper (Transcription).
+    • Mobile & Front-end : React Native (Expo), NextJs, Livewire, Tailwind CSS, Alpine.js.
+    • Bases de Données & Infra : MySQL, PostgreSQL, Redis (Caching/Queues), MongoDB, Firebase, Git (GitFlow).
+    • Méthodologies : SOLID, DRY, KISS, Design Patterns (Repository, Factory, Observer), Clean Architecture.
+    • Expertise 3D & Multimédia : Cinema 4D (modélisation, texturing, éclairage, rendu), Adobe After Effects, Premiere Pro, Photoshop (post-production, montage vidéo, effets spéciaux) ; création de storyboards et maquettes publicitaires (Radio TV Jupiter & Stage Mevalaza Junior).
+  
+LANGUES
+    • Français & Malgache : Langues maternelles / Courant.
+    • Anglais : Professionnel (Lecture technique, rédaction de documentation et veille technologique constante).
+
+LOISIRS & INTÉRÊTS
+    • Football : Supporter passionné
+    • Échecs : Joueur amateur engagé
+    • Culture japonaise : Amateur de manga et anime

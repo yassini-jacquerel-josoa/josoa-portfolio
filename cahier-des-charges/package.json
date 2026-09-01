@@ -1,0 +1,12 @@
+{
+  "name": "cahier-des-charges-pharmacie",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Génère le cahier des charges Gestionnaire de Pharmacie (.docx)",
+  "scripts": {
+    "generate": "node generate.js"
+  },
+  "dependencies": {
+    "docx": "^9.5.0"
+  }
+}
