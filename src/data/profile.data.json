@@ -1,0 +1,300 @@
+{
+  "identity": {
+    "fullName": "JOSOA Yassini Jacquerel",
+    "brand": "JOSOA",
+    "markPrefix": "jac.",
+    "mark": "YASSINI",
+    "location": "Nosy-Be, Madagascar",
+    "email": "josoayassinijacquerel@gmail.com",
+    "phone": "+261 32 55 268 02"
+  },
+  "headline": "Développeur Senior | Laravel · Flutter · React Native | IA & SaaS",
+  "about": "Développeur senior avec plus de 6 ans d'expérience, spécialisé en architecture logicielle, Laravel et produits web à forte valeur métier. J'interviens sur des projets complexes, from scratch ou en reprise d'existant, avec un code robuste, lisible et maintenable. Je mêle PHP, Python et IA appliquée (LangChain, LangGraph). Côté mobile, je livre des applications React Native (Expo) et Flutter, dont certaines publiées sur Google Play et l'App Store. Je pars du terrain, je livre simple, puis j'itère.",
+  "experience": [
+    {
+      "title": "Consultant en développement",
+      "organization": "SMAR'TEK Sambava",
+      "employmentType": "Indépendant",
+      "location": "à distance",
+      "start": "2025-01",
+      "end": null,
+      "current": true,
+      "description": "Contribution aux projets web, desktop et mobile."
+    },
+    {
+      "title": "Fondateur & développeur freelance",
+      "organization": "effi'Cash",
+      "location": "TODO",
+      "start": "TODO",
+      "end": null,
+      "current": true,
+      "description": "Plateforme de gestion de kiosques mobile money (Mvola, Orange Money, Airtel Money). Backend Laravel, app Flutter offline-first, moteur de commissions à paliers, modes agent et gérant.",
+      "skills": [
+        "Laravel",
+        "Flutter",
+        "Dart",
+        "Conception de logiciels",
+        "Leadership technique"
+      ]
+    },
+    {
+      "title": "Co-fondateur",
+      "organization": "Z'Hay Awards",
+      "location": "TODO",
+      "start": "TODO",
+      "end": null,
+      "current": true,
+      "description": "Concours artistiques malgaches et pages artistes en ligne."
+    },
+    {
+      "title": "Responsable d'équipe & développeur full-stack senior",
+      "organization": "Alsasoft Madagascar",
+      "location": "TODO",
+      "start": "2023-03",
+      "end": "TODO",
+      "current": false,
+      "description": "Équipe de TODO développeurs. Architecture PHP 8.2 (SOLID, DDD, MVC), agents IA (LangChain, LangGraph, RAG, OpenAI), apps React Native (Expo, Firebase, OneSignal, RevenueCat), publication Google Play / App Store, revues de code, Scrum. Produits : Wondergeorge, MyRacingCoach, Soipakon, Fixebo, MakeMeUp, BDE, Sunextend, EFT, wg-editor."
+    },
+    {
+      "title": "Stagiaire développeur full-stack",
+      "organization": "MADA-Digital",
+      "location": "TODO",
+      "start": "2022-10",
+      "end": "2022-12",
+      "current": false,
+      "description": "Base de données et gestion des stocks/commandes pour une pharmacie."
+    },
+    {
+      "title": "Développeur web full-stack PHP",
+      "organization": "Magic-Net",
+      "location": "TODO",
+      "start": "2020-03",
+      "end": "2021-02",
+      "current": false,
+      "description": "Refonte de modules de gestion universitaire en PHP natif, migration MySQL, optimisation."
+    }
+  ],
+  "projects": [
+    {
+      "name": "effi'Cash",
+      "role": "Fondateur & développeur freelance",
+      "description": "Plateforme de gestion de kiosques mobile money (Mvola, Orange Money, Airtel Money). Backend Laravel, app Flutter offline-first, moteur de commissions à paliers, modes agent et gérant.",
+      "stack": [
+        "Laravel",
+        "Flutter",
+        "Dart"
+      ],
+      "url": "https://efficash.mg",
+      "status": "en_cours"
+    },
+    {
+      "name": "Z'Hay Awards",
+      "role": "Co-fondateur",
+      "description": "Plateforme de concours et de pages artistes.",
+      "stack": [
+        "TODO"
+      ],
+      "url": "https://z-hayawards.frehyy.mg/",
+      "status": "en_cours"
+    },
+    {
+      "name": "Wondergeorge",
+      "role": "Lead développeur",
+      "description": "SaaS de création de sites par IA. Site complet généré en moins de 45 s, traduction multilingue, blogging IA SEO.",
+      "stack": [
+        "Laravel",
+        "Livewire",
+        "FastAPI",
+        "LangChain",
+        "MySQL"
+      ],
+      "url": "TODO",
+      "status": "termine"
+    },
+    {
+      "name": "SmartBots",
+      "role": "Lead développeur freelance",
+      "description": "Assistant IA multi-services. Orchestrateur, replay LangGraph, plugins, validation humaine.",
+      "stack": [
+        "React Native",
+        "LangChain",
+        "LangGraph",
+        "OAuth2",
+        "Google/Microsoft APIs"
+      ],
+      "url": "TODO",
+      "status": "termine"
+    },
+    {
+      "name": "MyRacingCoach",
+      "role": "TODO",
+      "description": "Coaching karting. Publié sur Google Play et App Store.",
+      "stack": [
+        "Next.js",
+        "React Native Expo",
+        "Laravel",
+        "Firebase",
+        "OpenAI API"
+      ],
+      "url": "TODO",
+      "status": "termine"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Master 1",
+      "field": "Ingénierie des Communications Électroniques",
+      "school": "IST-D Antsiranana",
+      "start": "TODO",
+      "end": null,
+      "current": true,
+      "notes": "Délibération en attente. Optimisation, algorithmique, analyse numérique, traitement du signal, systèmes embarqués, réseaux."
+    },
+    {
+      "degree": "Technicien Supérieur Spécialisé",
+      "field": "Administration de Réseaux",
+      "school": "IST-D",
+      "start": "2021",
+      "end": "2022",
+      "current": false,
+      "mention": "Très Bien"
+    },
+    {
+      "degree": "Technicien Supérieur",
+      "field": "Technologies de l'Information et du Multimédia",
+      "school": "IST-D",
+      "start": "2020",
+      "end": "2021",
+      "current": false,
+      "mention": "Très Bien"
+    },
+    {
+      "degree": "Baccalauréat série D",
+      "school": "SEVEMA Ambanja",
+      "start": "2018",
+      "end": "2018",
+      "current": false,
+      "mention": "Bien"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Principales",
+      "items": [
+        "Laravel",
+        "React Native",
+        "Flutter"
+      ]
+    },
+    {
+      "category": "Backend",
+      "items": [
+        "PHP 8",
+        "Python",
+        "FastAPI",
+        "API REST",
+        "MySQL",
+        "PostgreSQL",
+        "Redis"
+      ]
+    },
+    {
+      "category": "Mobile",
+      "items": [
+        "Dart",
+        "TypeScript",
+        "Firebase",
+        "Expo",
+        "OneSignal",
+        "RevenueCat"
+      ]
+    },
+    {
+      "category": "IA",
+      "items": [
+        "LangChain",
+        "LangGraph",
+        "OpenAI API",
+        "RAG",
+        "Prompt Engineering",
+        "Pinecone",
+        "Whisper"
+      ]
+    },
+    {
+      "category": "Web",
+      "items": [
+        "Next.js",
+        "Livewire",
+        "Tailwind CSS",
+        "Alpine.js"
+      ]
+    },
+    {
+      "category": "Architecture",
+      "items": [
+        "Clean Architecture",
+        "SOLID",
+        "DDD",
+        "Design Patterns"
+      ]
+    },
+    {
+      "category": "Gestion",
+      "items": [
+        "Leadership technique",
+        "Agile/Scrum",
+        "Revue de code"
+      ]
+    },
+    {
+      "category": "Ingénierie",
+      "items": [
+        "Techniques d'optimisation",
+        "Algorithmique",
+        "Traitement du signal"
+      ]
+    },
+    {
+      "category": "Créatif",
+      "items": [
+        "Cinema 4D",
+        "After Effects",
+        "Premiere Pro",
+        "Photoshop"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "name": "Français",
+      "level": "natif/bilingue"
+    },
+    {
+      "name": "Malgache",
+      "level": "natif"
+    },
+    {
+      "name": "Anglais",
+      "level": "professionnel"
+    }
+  ],
+  "links": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/yassini-jacquerel-josoa/"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/yassini-jacquerel-josoa"
+    },
+    {
+      "label": "effi'Cash",
+      "url": "https://efficash.mg"
+    },
+    {
+      "label": "Z'Hay Awards",
+      "url": "https://z-hayawards.frehyy.mg/"
+    }
+  ]
+}

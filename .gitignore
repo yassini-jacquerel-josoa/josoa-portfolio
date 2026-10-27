@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Export LinkedIn officiel, local uniquement (peut contenir des données privées)
+data/linkedin-export/*
+!data/linkedin-export/.gitkeep

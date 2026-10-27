@@ -1,10 +1,16 @@
+import { profile } from "../data/profile.ts";
 import FontMorph from "./FontMorph";
 
 const navItems = [
-  { label: "MOI", href: "#apropos" },
-  { label: "PROJETS", href: "#projets" },
-  { label: "VALEURS", href: "#valeurs" },
+  { label: "Moi", href: "#apropos" },
+  { label: "Parcours", href: "#experience" },
+  { label: "Projets", href: "#projets" },
+  { label: "Formation", href: "#formation" },
+  { label: "Compétences", href: "#competences" },
+  { label: "Contact", href: "#contact" },
 ];
+
+const year = new Date().getFullYear();
 
 type PanelChromeProps = {
   /** hero = brand + menu + footer complet ; mark = JOSOA + jac. YASSINI seulement */
@@ -28,7 +34,7 @@ export default function PanelChrome({
       <header className="brand">
         <FontMorph
           className="brand__morph"
-          text="JOSOA"
+          text={profile.identity.brand}
           fontAUrl="/fonts/Anton-Regular.ttf"
           fontBUrl="/fonts/PlayfairDisplay.ttf"
           fontSize={96}
@@ -50,11 +56,13 @@ export default function PanelChrome({
 
       <div className={`footer${isMark ? " footer--mark-only" : ""}`}>
         {!isMark && (
-          <p className="footer__copy">FAIT AVEC SOIN À NOSY-BE ©2026</p>
+          <p className="footer__copy">
+            {profile.identity.location.toLocaleUpperCase("fr-FR")} ©{year}
+          </p>
         )}
         <div className="footer__mark">
-          <span className="footer__is">jac.</span>
-          <span className="footer__boring">YASSINI</span>
+          <span className="footer__is">{profile.identity.markPrefix}</span>
+          <span className="footer__boring">{profile.identity.mark}</span>
         </div>
       </div>
     </div>
