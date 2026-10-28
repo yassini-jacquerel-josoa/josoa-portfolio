@@ -1,0 +1,14 @@
+.git
+.github
+node_modules
+dist
+dist-ssr
+cahier-des-charges
+data/linkedin-export
+*.md
+.vscode
+.idea
+.DS_Store
+*.local
+.env
+*.log

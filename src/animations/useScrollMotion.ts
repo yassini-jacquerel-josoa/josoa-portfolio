@@ -4,17 +4,41 @@ import { animate, onScroll, stagger, type ScrollObserver } from "animejs";
 const ENTER = "right left";
 const CROSS = "left right";
 const REVEAL = "center center";
-const ARRIVE = "76% start";
+const ARRIVE = "68% start";
+/** Même seuil que la mise en page tablette/téléphone dans App.css */
+const DESKTOP_MOTION = "(min-width: 1041px)";
 
 /**
- * Parallax et entrées liées au scroll horizontal.
+ * Parallax et entrées du mode ordinateur, liées au scroll horizontal.
  * Le hero se rétracte en 1,4 s : on recalcule les seuils pendant cette transition.
  */
 export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready: boolean) {
   useEffect(() => {
     const container = rootRef.current;
     if (!container || !ready) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const desktop = window.matchMedia(DESKTOP_MOTION);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let stop = () => {};
+
+    const mount = () => {
+      stop();
+      if (!desktop.matches || reduced.matches) return;
+      stop = attachScrollMotion(container);
+    };
+
+    mount();
+    desktop.addEventListener("change", mount);
+    reduced.addEventListener("change", mount);
+    return () => {
+      desktop.removeEventListener("change", mount);
+      reduced.removeEventListener("change", mount);
+      stop();
+    };
+  }, [ready, rootRef]);
+}
+
+function attachScrollMotion(container: HTMLDivElement) {
 
     const animations: Array<ReturnType<typeof animate>> = [];
     const observers: ScrollObserver[] = [];
@@ -23,20 +47,20 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
     const bind = (
       targets: HTMLElement | HTMLElement[],
       parameters: Parameters<typeof animate>[1],
-      range: { target: HTMLElement; enter?: string; leave?: string },
+      range: { target: HTMLElement; enter?: string; leave?: string; sync?: boolean | "inOutSine" },
     ) => {
       const list = Array.isArray(targets) ? targets : [targets];
       if (list.length === 0) return;
       const observer = onScroll({
         container,
         axis: "x",
-        sync: true,
+        sync: range.sync ?? true,
         enter: range.enter ?? ENTER,
         leave: range.leave ?? CROSS,
         target: range.target,
       });
       observers.push(observer);
-      animations.push(animate(list, { ...parameters, autoplay: observer }));
+      animations.push(animate(list, { ease: "inOutSine", ...parameters, autoplay: observer }));
     };
 
     const collage = container.querySelector<HTMLElement>(".collage");
@@ -45,15 +69,15 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
     if (collage && base) {
       bind(
         base,
-        { x: ["7%", "-11%"], y: ["-3%", "4%"], scale: [1.14, 1.04], ease: "linear" },
-        { target: collage },
+        { x: ["8%", "-14%"], y: ["-4%", "5%"], scale: [1.16, 1.04], ease: "linear" },
+        { target: collage, sync: "inOutSine" },
       );
     }
     if (collage && overlay) {
       bind(
         overlay,
-        { x: ["-12%", "9%"], y: ["5%", "-4%"], scale: [1.16, 1.02], ease: "linear" },
-        { target: collage },
+        { x: ["-14%", "10%"], y: ["6%", "-5%"], scale: [1.18, 1.02], ease: "linear" },
+        { target: collage, sync: "inOutSine" },
       );
     }
 
@@ -64,18 +88,18 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
         bind(
           back,
           {
-            x: index === 0 ? ["-7%", "7%"] : ["6%", "-8%"],
-            y: index === 0 ? ["3%", "-4%"] : ["-3%", "5%"],
-            scale: [1.12, 1.04],
+            x: index === 0 ? ["-8%", "9%"] : ["8%", "-10%"],
+            y: index === 0 ? ["4%", "-5%"] : ["-4%", "6%"],
+            scale: [1.14, 1.04],
             ease: "linear",
           },
-          { target: box },
+          { target: box, sync: "inOutSine" },
         );
       }
       if (front) {
         bind(
           front,
-          { x: ["0%", "108%"], ease: "inOutCubic" },
+          { x: ["0%", "108%"], ease: "inOutSine" },
           { target: box, enter: ENTER, leave: REVEAL },
         );
       }
@@ -87,10 +111,10 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
       bind(
         aboutLines,
         {
-          y: [26, 0],
+          y: [32, 0],
           opacity: [0, 1],
-          delay: stagger(110),
-          duration: 720,
+          delay: stagger(120),
+          duration: 900,
           ease: "outCubic",
         },
         { target: about, enter: ENTER, leave: "68% start" },
@@ -102,27 +126,31 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
       if (!image) return;
       bind(
         image,
-        { x: ["9%", "-8%"], scale: [1.18, 1.03], ease: "linear" },
-        { target: card },
+        { x: ["12%", "-10%"], scale: [1.2, 1.03], ease: "linear" },
+        { target: card, sync: "inOutSine" },
       );
     });
 
     const principles = container.querySelector<HTMLElement>(".principles");
     if (principles) {
       const shifts: Array<[string, string]> = [
-        ["2.4vw", "-3.6vw"],
-        ["-1.8vw", "4.2vw"],
-        ["3vw", "-2.2vw"],
+        ["5vw", "-7vw"],
+        ["-4vw", "8vw"],
+        ["6vw", "-4vw"],
       ];
       container.querySelectorAll<HTMLElement>(".principles__row").forEach((row, index) => {
-        bind(row, { x: shifts[index] ?? ["1vw", "-1vw"], ease: "linear" }, { target: principles });
+        bind(
+          row,
+          { x: shifts[index] ?? ["2vw", "-2vw"], ease: "linear" },
+          { target: principles, sync: "inOutSine" },
+        );
       });
     }
 
     container.querySelectorAll<HTMLElement>("[data-motion='enter']").forEach((node) => {
       bind(
         node,
-        { y: [22, 0], opacity: [0, 1], duration: 800, ease: "outCubic" },
+        { y: [28, 0], opacity: [0, 1], duration: 900, ease: "outCubic" },
         { target: node, enter: ENTER, leave: ARRIVE },
       );
     });
@@ -162,5 +190,4 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
       window.removeEventListener("resize", refresh);
       for (const animation of animations) animation.revert();
     };
-  }, [ready, rootRef]);
 }

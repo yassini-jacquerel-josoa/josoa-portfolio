@@ -64,6 +64,10 @@
   box-sizing: border-box;
 }
 
+.panel:focus {
+  outline: none;
+}
+
 /* ——— Chrome dans chaque panel (suit la largeur du panel) ——— */
 .panel-chrome {
   position: absolute;
