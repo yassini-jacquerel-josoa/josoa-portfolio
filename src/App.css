@@ -415,6 +415,7 @@
   height: 100%;
   margin: 0;
   object-position: center 18%;
+  transform-origin: center 38%;
 }
 
 .collage__overlay {

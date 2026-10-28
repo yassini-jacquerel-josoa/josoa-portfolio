@@ -23,8 +23,8 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
 
     const mount = () => {
       stop();
-      if (!desktop.matches || reduced.matches) return;
-      stop = attachScrollMotion(container);
+      if (reduced.matches) return;
+      stop = attachScrollMotion(container, desktop.matches);
     };
 
     mount();
@@ -38,7 +38,7 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
   }, [ready, rootRef]);
 }
 
-function attachScrollMotion(container: HTMLDivElement) {
+function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
 
     const animations: Array<ReturnType<typeof animate>> = [];
     const observers: ScrollObserver[] = [];
@@ -66,22 +66,24 @@ function attachScrollMotion(container: HTMLDivElement) {
     const collage = container.querySelector<HTMLElement>(".collage");
     const base = container.querySelector<HTMLElement>(".collage__base img");
     const overlay = container.querySelector<HTMLElement>(".collage__overlay img");
+    // Le portrait commence sur un cadrage serré (moitié du visage), puis le scroll découvre la photo entière.
+    const portraitReveal = { target: collage, enter: "left left", leave: "left 32%", sync: true as const };
     if (collage && base) {
       bind(
         base,
-        { x: ["8%", "-14%"], y: ["-4%", "5%"], scale: [1.16, 1.04], ease: "linear" },
-        { target: collage, sync: "inOutSine" },
+        { scale: [1.65, 1], ease: "inOutCubic" },
+        portraitReveal,
       );
     }
     if (collage && overlay) {
       bind(
         overlay,
-        { x: ["-14%", "10%"], y: ["6%", "-5%"], scale: [1.18, 1.02], ease: "linear" },
-        { target: collage, sync: "inOutSine" },
+        { opacity: [0, 1], x: ["10%", "0%"], ease: "inOutSine" },
+        portraitReveal,
       );
     }
 
-    container.querySelectorAll<HTMLElement>(".origin__box").forEach((box, index) => {
+    if (desktop) container.querySelectorAll<HTMLElement>(".origin__box").forEach((box, index) => {
       const back = box.querySelector<HTMLElement>(".origin__img--back");
       const front = box.querySelector<HTMLElement>(".origin__img--front");
       if (back) {
@@ -105,55 +107,57 @@ function attachScrollMotion(container: HTMLDivElement) {
       }
     });
 
-    const about = container.querySelector<HTMLElement>(".about");
-    const aboutLines = [...container.querySelectorAll<HTMLElement>(".about__line")];
-    if (about && aboutLines.length > 0) {
-      bind(
-        aboutLines,
-        {
-          y: [32, 0],
-          opacity: [0, 1],
-          delay: stagger(120),
-          duration: 900,
-          ease: "outCubic",
-        },
-        { target: about, enter: ENTER, leave: "68% start" },
-      );
-    }
-
-    container.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
-      const image = card.querySelector<HTMLElement>(".project-card__media img");
-      if (!image) return;
-      bind(
-        image,
-        { x: ["12%", "-10%"], scale: [1.2, 1.03], ease: "linear" },
-        { target: card, sync: "inOutSine" },
-      );
-    });
-
-    const principles = container.querySelector<HTMLElement>(".principles");
-    if (principles) {
-      const shifts: Array<[string, string]> = [
-        ["5vw", "-7vw"],
-        ["-4vw", "8vw"],
-        ["6vw", "-4vw"],
-      ];
-      container.querySelectorAll<HTMLElement>(".principles__row").forEach((row, index) => {
+    if (desktop) {
+      const about = container.querySelector<HTMLElement>(".about");
+      const aboutLines = [...container.querySelectorAll<HTMLElement>(".about__line")];
+      if (about && aboutLines.length > 0) {
         bind(
-          row,
-          { x: shifts[index] ?? ["2vw", "-2vw"], ease: "linear" },
-          { target: principles, sync: "inOutSine" },
+          aboutLines,
+          {
+            y: [32, 0],
+            opacity: [0, 1],
+            delay: stagger(120),
+            duration: 900,
+            ease: "outCubic",
+          },
+          { target: about, enter: ENTER, leave: "68% start" },
+        );
+      }
+
+      container.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
+        const image = card.querySelector<HTMLElement>(".project-card__media img");
+        if (!image) return;
+        bind(
+          image,
+          { x: ["12%", "-10%"], scale: [1.2, 1.03], ease: "linear" },
+          { target: card, sync: "inOutSine" },
+        );
+      });
+
+      const principles = container.querySelector<HTMLElement>(".principles");
+      if (principles) {
+        const shifts: Array<[string, string]> = [
+          ["5vw", "-7vw"],
+          ["-4vw", "8vw"],
+          ["6vw", "-4vw"],
+        ];
+        container.querySelectorAll<HTMLElement>(".principles__row").forEach((row, index) => {
+          bind(
+            row,
+            { x: shifts[index] ?? ["2vw", "-2vw"], ease: "linear" },
+            { target: principles, sync: "inOutSine" },
+          );
+        });
+      }
+
+      container.querySelectorAll<HTMLElement>("[data-motion='enter']").forEach((node) => {
+        bind(
+          node,
+          { y: [28, 0], opacity: [0, 1], duration: 900, ease: "outCubic" },
+          { target: node, enter: ENTER, leave: ARRIVE },
         );
       });
     }
-
-    container.querySelectorAll<HTMLElement>("[data-motion='enter']").forEach((node) => {
-      bind(
-        node,
-        { y: [28, 0], opacity: [0, 1], duration: 900, ease: "outCubic" },
-        { target: node, enter: ENTER, leave: ARRIVE },
-      );
-    });
 
     const refresh = () => {
       if (!alive) return;
