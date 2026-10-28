@@ -1,5 +1,7 @@
 import type { Profile } from "../src/data/profile.schema.ts";
 
+const siteUrl = "https://yassini.frehyy.mg/";
+
 function firstSentence(text: string): string {
   const sentence = text
     .split(/(?<=\.)\s+/)
@@ -41,6 +43,7 @@ function personJsonLd(profile: Profile): Record<string, unknown> {
     "@context": "https://schema.org",
     "@type": "Person",
     name: profile.identity.fullName,
+    url: siteUrl,
     jobTitle: profile.headline,
     email: profile.identity.email,
     telephone: profile.identity.phone,
@@ -72,7 +75,9 @@ export function renderSeoTags(profile: Profile): string {
     `    <meta property="og:description" content="${escapeHtml(description)}" />`,
     `    <meta property="og:type" content="profile" />`,
     `    <meta property="og:locale" content="fr_FR" />`,
+    `    <meta property="og:url" content="${siteUrl}" />`,
     `    <meta property="og:site_name" content="${escapeHtml(profile.identity.fullName)}" />`,
+    `    <link rel="canonical" href="${siteUrl}" />`,
     `    <script type="application/ld+json">`,
     jsonLd
       .split("\n")
