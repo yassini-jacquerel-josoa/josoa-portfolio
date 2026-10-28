@@ -1,13 +1,14 @@
 import { profile } from "../data/profile.ts";
+import { t } from "../i18n/index.ts";
 import FontMorph from "./FontMorph";
 
 const navItems = [
-  { label: "Moi", href: "#apropos" },
-  { label: "Parcours", href: "#experience" },
-  { label: "Projets", href: "#projets" },
-  { label: "Formation", href: "#formation" },
-  { label: "Compétences", href: "#competences" },
-  { label: "Contact", href: "#contact" },
+  { label: t("nav.about"), href: "#apropos" },
+  { label: t("nav.experience"), href: "#experience" },
+  { label: t("nav.projects"), href: "#projets" },
+  { label: t("nav.education"), href: "#formation" },
+  { label: t("nav.skills"), href: "#competences" },
+  { label: t("nav.contact"), href: "#contact" },
 ];
 
 const year = new Date().getFullYear();
@@ -43,7 +44,7 @@ export default function PanelChrome({
       </header>
 
       {!isMark && (
-        <nav className="nav" aria-label="Principal">
+        <nav className="nav" aria-label={t("aria.nav")}>
           <ul>
             {navItems.map((item) => (
               <li key={item.label}>

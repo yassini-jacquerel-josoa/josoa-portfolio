@@ -1,3 +1,4 @@
+import { monthName, t } from "../i18n/index.ts";
 import profileData from "./profile.data.json" with { type: "json" };
 import {
   formatProfileIssues,
@@ -18,25 +19,9 @@ export const profile: Profile = parsed.data;
 
 export type { Education, Experience, Profile, Project };
 
-const MONTHS = [
-  "janvier",
-  "février",
-  "mars",
-  "avril",
-  "mai",
-  "juin",
-  "juillet",
-  "août",
-  "septembre",
-  "octobre",
-  "novembre",
-  "décembre",
-] as const;
-
-export const projectStatusLabel = {
-  en_cours: "En cours",
-  termine: "Terminé",
-} as const;
+export function projectStatusLabel(status: Project["status"]): string {
+  return t(`projectStatus.${status}`);
+}
 
 export function sentences(text: string): string[] {
   return text
@@ -87,30 +72,30 @@ export function headlineBits(headline: string): {
 }
 
 export function formatDate(value: string): string {
-  if (value === "TODO") return "TODO";
   const match = /^(\d{4})-(\d{2})$/.exec(value);
   if (!match) return value;
-  const month = MONTHS[Number(match[2]) - 1];
+  const month = monthName(Number(match[2]) - 1);
   return month ? `${month} ${match[1]}` : value;
 }
 
 function formatRange(start: string, end: string | null): string {
   const startLabel = formatDate(start);
-  const endLabel = end ? formatDate(end) : "TODO";
+  if (!end) return startLabel;
+  const endLabel = formatDate(end);
   if (startLabel === endLabel) return startLabel;
   return `${startLabel} – ${endLabel}`;
 }
 
 export function formatExperiencePeriod(item: Pick<Experience, "start" | "end" | "current">): string {
-  if (item.current) return `depuis ${formatDate(item.start)} · poste actuel`;
+  if (item.current) {
+    return `${t("period.since")} ${formatDate(item.start)} · ${t("period.currentRole")}`;
+  }
   return formatRange(item.start, item.end);
 }
 
 export function formatEducationPeriod(item: Pick<Education, "start" | "end" | "current">): string {
   if (item.current) {
-    return item.start === "TODO"
-      ? "début TODO · en cours"
-      : `depuis ${formatDate(item.start)} · en cours`;
+    return `${t("period.since")} ${formatDate(item.start)} · ${t("period.ongoing")}`;
   }
   return formatRange(item.start, item.end);
 }
@@ -118,6 +103,11 @@ export function formatEducationPeriod(item: Pick<Education, "start" | "end" | "c
 export function phoneHref(phone: string): string {
   const compact = phone.replace(/[^\d+]/g, "");
   return `tel:${compact || phone}`;
+}
+
+export function whatsappHref(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `https://wa.me/${digits}`;
 }
 
 export function cityOf(location: string): string {

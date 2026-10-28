@@ -15,8 +15,8 @@ export type Visual = {
 
 export const gallery = {
   workspace: {
-    src: "/images/workspace.jpg",
-    alt: "Bureau avec un ordinateur ouvert sur du code",
+    src: "/images/portrait.png",
+    alt: "Portrait de JOSOA Yassini Jacquerel",
   },
   code: {
     src: "/images/code.jpg",

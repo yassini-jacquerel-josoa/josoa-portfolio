@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import opentype from "opentype.js";
 import flubber from "flubber";
+import { t } from "../i18n/index.ts";
 
 const { interpolate } = flubber;
 
@@ -161,7 +162,7 @@ export default function FontMorph({
       role="button"
       tabIndex={0}
       aria-busy={loading}
-      aria-label={`${text} — cliquer pour morpher la typographie`}
+      aria-label={`${text} — ${t("aria.morph")}`}
       style={{ cursor: failed ? "default" : "pointer", userSelect: "none" }}
     >
       {loading || failed || letters.length === 0 ? (

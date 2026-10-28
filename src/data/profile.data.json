@@ -24,8 +24,8 @@
     {
       "title": "Fondateur & développeur freelance",
       "organization": "effi'Cash",
-      "location": "TODO",
-      "start": "TODO",
+      "location": "Hell-Ville, Nosy-Be",
+      "start": "2026-07",
       "end": null,
       "current": true,
       "description": "Plateforme de gestion de kiosques mobile money (Mvola, Orange Money, Airtel Money). Backend Laravel, app Flutter offline-first, moteur de commissions à paliers, modes agent et gérant.",
@@ -40,25 +40,25 @@
     {
       "title": "Co-fondateur",
       "organization": "Z'Hay Awards",
-      "location": "TODO",
-      "start": "TODO",
+      "location": "En ligne",
+      "start": "2025",
       "end": null,
       "current": true,
-      "description": "Concours artistiques malgaches et pages artistes en ligne."
+      "description": "Concours artistiques malgaches et pages artistes, en ligne sur le site et Facebook."
     },
     {
       "title": "Responsable d'équipe & développeur full-stack senior",
       "organization": "Alsasoft Madagascar",
-      "location": "TODO",
+      "location": "Nosy-Be",
       "start": "2023-03",
-      "end": "TODO",
+      "end": "2026-05",
       "current": false,
-      "description": "Équipe de TODO développeurs. Architecture PHP 8.2 (SOLID, DDD, MVC), agents IA (LangChain, LangGraph, RAG, OpenAI), apps React Native (Expo, Firebase, OneSignal, RevenueCat), publication Google Play / App Store, revues de code, Scrum. Produits : Wondergeorge, MyRacingCoach, Soipakon, Fixebo, MakeMeUp, BDE, Sunextend, EFT, wg-editor."
+      "description": "Équipe de 4 développeurs. Architecture PHP 8.2 (SOLID, DDD, MVC), agents IA (LangChain, LangGraph, RAG, OpenAI), apps React Native (Expo, Firebase, OneSignal, RevenueCat), publication Google Play / App Store, revues de code, Scrum. Produits : Wondergeorge, MyRacingCoach, Soipakon, Fixebo, MakeMeUp, BDE, Sunextend, EFT, wg-editor."
     },
     {
       "title": "Stagiaire développeur full-stack",
       "organization": "MADA-Digital",
-      "location": "TODO",
+      "location": "Antsiranana",
       "start": "2022-10",
       "end": "2022-12",
       "current": false,
@@ -67,7 +67,7 @@
     {
       "title": "Développeur web full-stack PHP",
       "organization": "Magic-Net",
-      "location": "TODO",
+      "location": "Antsiranana",
       "start": "2020-03",
       "end": "2021-02",
       "current": false,
@@ -84,7 +84,12 @@
         "Flutter",
         "Dart"
       ],
-      "url": "https://efficash.mg",
+      "links": [
+        {
+          "label": "efficash.mg",
+          "url": "https://efficash.mg"
+        }
+      ],
       "status": "en_cours"
     },
     {
@@ -92,9 +97,17 @@
       "role": "Co-fondateur",
       "description": "Plateforme de concours et de pages artistes.",
       "stack": [
-        "TODO"
+        "Next.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "MongoDB"
       ],
-      "url": "https://z-hayawards.frehyy.mg/",
+      "links": [
+        {
+          "label": "z-hayawards.frehyy.mg",
+          "url": "https://z-hayawards.frehyy.mg/"
+        }
+      ],
       "status": "en_cours"
     },
     {
@@ -108,7 +121,12 @@
         "LangChain",
         "MySQL"
       ],
-      "url": "TODO",
+      "links": [
+        {
+          "label": "Site v1",
+          "url": "https://www.wonder-george.com"
+        }
+      ],
       "status": "termine"
     },
     {
@@ -122,21 +140,36 @@
         "OAuth2",
         "Google/Microsoft APIs"
       ],
-      "url": "TODO",
+      "links": [
+        {
+          "label": "SmartBots",
+          "url": "https://amenitydev.com/fr/solutions/smartbots"
+        }
+      ],
       "status": "termine"
     },
     {
       "name": "MyRacingCoach",
-      "role": "TODO",
-      "description": "Coaching karting. Publié sur Google Play et App Store.",
+      "role": "Développeur Full-Stack",
+      "description": "Plateforme de coaching karting. Application mobile React Native, backoffice Next.js, chatbot IA d'analyse et de recommandations. Publication sur Google Play et l'App Store.",
       "stack": [
+        "React Native (Expo)",
         "Next.js",
-        "React Native Expo",
         "Laravel",
         "Firebase",
+        "TypeScript",
         "OpenAI API"
       ],
-      "url": "TODO",
+      "links": [
+        {
+          "label": "App Store",
+          "url": "https://apps.apple.com/fr/app/my-racing-coach/id6748516389"
+        },
+        {
+          "label": "Google Play",
+          "url": "https://play.google.com/store/apps/details?id=com.myracingcoach.app"
+        }
+      ],
       "status": "termine"
     }
   ],
@@ -145,7 +178,7 @@
       "degree": "Master 1",
       "field": "Ingénierie des Communications Électroniques",
       "school": "IST-D Antsiranana",
-      "start": "TODO",
+      "start": "2025-12",
       "end": null,
       "current": true,
       "notes": "Délibération en attente. Optimisation, algorithmique, analyse numérique, traitement du signal, systèmes embarqués, réseaux."

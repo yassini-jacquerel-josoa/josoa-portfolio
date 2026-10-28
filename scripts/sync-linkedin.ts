@@ -7,8 +7,8 @@
 // - notes et mention d'une formation déjà renseignées
 //
 // Le headline est mis à jour depuis Profile.csv.
-// Les dates, lieux et URL encore à TODO sont complétés quand l'export
-// contient une valeur concrète. Les entrées inconnues sont ajoutées.
+// Les dates, lieux et URL encore marqués TODO sont complétés quand l'export
+// contient une valeur concrète. Une entrée nouvelle incomplète n'est pas ajoutée.
 // La date de naissance et l'adresse postale ne sont jamais écrites.
 
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -212,14 +212,20 @@ function merge(profile: Profile, tables: Record<string, CsvRow[]>): string[] {
 
     if (!existing) {
       const ongoing = endRaw.trim() === "" && start !== null;
+      if (!title || !organization || !location || !start || !description || (!ongoing && !end)) {
+        changes.push(
+          `expérience non ajoutée (données incomplètes) : ${title || "sans titre"} — ${organization || "sans organisation"}`,
+        );
+        continue;
+      }
       const entry: Experience = {
-        title: title || "TODO",
-        organization: organization || "TODO",
-        location: location || "TODO",
-        start: start || "TODO",
-        end: ongoing ? null : end || (endRaw.trim() === "" ? null : "TODO"),
+        title,
+        organization,
+        location,
+        start,
+        end: ongoing ? null : end,
         current: ongoing,
-        description: description || "TODO",
+        description,
       };
       if (entry.current) profile.experience.unshift(entry);
       else profile.experience.push(entry);
@@ -251,7 +257,7 @@ function merge(profile: Profile, tables: Record<string, CsvRow[]>): string[] {
         changes.push(`expérience « ${existing.organization} » : fin ${end}`);
       } else if (endRaw.trim() === "") {
         changes.push(
-          `expérience « ${existing.organization} » : fin laissée à TODO (l'export n'a pas de date de fin)`,
+          `expérience « ${existing.organization} » : l'export n'a pas de date de fin`,
         );
       }
     }
@@ -271,11 +277,17 @@ function merge(profile: Profile, tables: Record<string, CsvRow[]>): string[] {
 
     if (!existing) {
       const ongoing = endRaw.trim() === "" && start !== null;
+      if (!degree || !school || !start || (!ongoing && !end)) {
+        changes.push(
+          `formation non ajoutée (données incomplètes) : ${degree || "sans diplôme"} — ${school || "sans école"}`,
+        );
+        continue;
+      }
       const entry: Education = {
-        degree: degree || "TODO",
-        school: school || "TODO",
-        start: start || "TODO",
-        end: ongoing ? null : end || (endRaw.trim() === "" ? null : "TODO"),
+        degree,
+        school,
+        start,
+        end: ongoing ? null : end,
         current: ongoing,
       };
       if (notes) entry.notes = notes;
@@ -321,25 +333,12 @@ function merge(profile: Profile, tables: Record<string, CsvRow[]>): string[] {
     if (!name) continue;
     const description = pick(row, ["Description"]);
     const url = normalizeUrl(pick(row, ["Url", "URL", "Project Url"]));
-    const endRaw = pick(row, ["Finished On", "End Date"]);
     const existing = findProject(profile.projects, name);
 
     if (!existing) {
-      const entry: Project = {
-        name,
-        role: "TODO",
-        description: description || "TODO",
-        stack: ["TODO"],
-        url: url || "TODO",
-        status: endRaw.trim() === "" ? "en_cours" : "termine",
-      };
-      if (entry.status === "en_cours") {
-        const lastCurrent = profile.projects.findLastIndex((item) => item.status === "en_cours");
-        profile.projects.splice(lastCurrent + 1, 0, entry);
-      } else {
-        profile.projects.push(entry);
-      }
-      changes.push(`projet ajouté : ${name}`);
+      changes.push(
+        `projet « ${name} » non ajouté : le rôle et la stack se rédigent dans profile.data.json`,
+      );
       continue;
     }
 
@@ -349,9 +348,8 @@ function merge(profile: Profile, tables: Record<string, CsvRow[]>): string[] {
     } else if (description && description !== existing.description) {
       conserved.add(`projet « ${existing.name} »`);
     }
-    if (url && isTodo(existing.url)) {
-      existing.url = url;
-      changes.push(`projet « ${existing.name} » : lien ${url}`);
+    if (url && !existing.links.some((link) => canonUrl(link.url) === canonUrl(url))) {
+      conserved.add(`lien « ${existing.name} »`);
     }
   }
 

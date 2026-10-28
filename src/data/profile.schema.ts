@@ -9,15 +9,14 @@ const requiredText = z
   .string({ error: "champ obligatoire" })
   .min(1, { error: "champ obligatoire" });
 
-const yearMonth = z.string().regex(/^(?:TODO|\d{4}(?:-(?:0[1-9]|1[0-2]))?)$/, {
-  error: "date AAAA, AAAA-MM ou TODO",
+const yearMonth = z.string().regex(/^\d{4}(?:-(?:0[1-9]|1[0-2]))?$/, {
+  error: "date AAAA ou AAAA-MM",
 });
 
-const urlOrTodo = z
-  .string({ error: "champ obligatoire" })
-  .refine((value) => value === "TODO" || z.url().safeParse(value).success, {
-    error: "URL ou TODO attendu",
-  });
+const projectLinkSchema = z.strictObject({
+  label: requiredText,
+  url: z.url({ error: "URL invalide" }),
+});
 
 const experienceSchema = z.strictObject({
   title: requiredText,
@@ -36,7 +35,7 @@ const projectSchema = z.strictObject({
   role: requiredText,
   description: requiredText,
   stack: z.array(requiredText).min(1, { error: "stack obligatoire" }),
-  url: urlOrTodo,
+  links: z.array(projectLinkSchema).min(1, { error: "au moins un lien" }),
   status: z.enum(["en_cours", "termine"], {
     error: "statut en_cours ou termine obligatoire",
   }),

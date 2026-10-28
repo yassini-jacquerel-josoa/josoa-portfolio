@@ -13,6 +13,7 @@ import {
   SkillsPanel,
 } from "./components/profile/ProfilePanels";
 import { gallery } from "./data/visuals";
+import { t } from "./i18n/index.ts";
 import "./App.css";
 
 function App() {
@@ -244,12 +245,12 @@ function App() {
           className={`top-scroller${heroShrunk ? " top-scroller--open" : ""}`}
           ref={scrollerRef}
           id="top"
-          aria-label="Parcours horizontal"
+          aria-label={t("aria.scroller")}
         >
           <div className="top-track">
             <HeroPanel shrunk={heroShrunk} />
 
-            <section className="panel collage" aria-label="Galerie visuelle">
+            <section className="panel collage" aria-label={t("aria.galleryVisual")}>
               <div className="collage__base">
                 <img src={gallery.workspace.src} alt={gallery.workspace.alt} />
               </div>
@@ -260,7 +261,7 @@ function App() {
 
             <AboutPanel />
 
-            <section className="panel origin" aria-label="Galerie" data-show-mark>
+            <section className="panel origin" aria-label={t("aria.gallery")} data-show-mark>
               <div className="origin__boxes">
                 <div className="origin__box origin__box--a">
                   <div className="origin__stack">

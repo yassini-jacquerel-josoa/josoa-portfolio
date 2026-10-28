@@ -1,3 +1,4 @@
+import { t } from "../../i18n/index.ts";
 import PanelChrome from "../PanelChrome.tsx";
 import {
   cityOf,
@@ -10,15 +11,12 @@ import {
   phoneHref,
   profile,
   projectStatusLabel,
+  whatsappHref,
 } from "../../data/profile.ts";
 import { fallbackVisual, projectVisuals } from "../../data/visuals.ts";
 
 const PROJECT_TONES = ["tone-0", "tone-1", "tone-2"] as const;
 const HIGHLIGHT_ROWS = ["one", "two", "three"] as const;
-
-function placeLabel(location: string): string {
-  return location === "TODO" ? "Lieu : TODO" : location;
-}
 
 export function HeroPanel({ shrunk }: { shrunk: boolean }) {
   const bits = headlineBits(profile.headline);
@@ -26,11 +24,11 @@ export function HeroPanel({ shrunk }: { shrunk: boolean }) {
   return (
     <section
       className={`panel hero${shrunk ? " hero--shrunk" : ""}`}
-      aria-label="Accueil"
+      aria-label={t("aria.home")}
     >
       <PanelChrome variant="hero" />
       <a className="home-link" href="#top">
-        Bienvenue
+        {t("aria.welcome")}
       </a>
 
       <div className="hero__inner" data-scroll-y>
@@ -69,11 +67,11 @@ export function AboutPanel() {
     <section
       className="panel about"
       id="apropos"
-      aria-label="À propos"
+      aria-label={t("aria.about")}
       data-show-mark
     >
       <div className="about__box">
-        <p className="about__label">Moi</p>
+        <p className="about__label">{t("nav.about")}</p>
         <div className="about__content">
           <h2 className="about__title">
             {bits.aboutLines.map((line, index) => (
@@ -93,7 +91,7 @@ export function AboutPanel() {
 
 export function PullQuotePanel() {
   return (
-    <section className="panel values" data-show-mark aria-label="Profil">
+    <section className="panel values" data-show-mark aria-label={t("aria.profile")}>
       <div className="values__body">
         <p className="values__text" data-motion="enter">
           {lastSentence(profile.about)}
@@ -118,10 +116,10 @@ export function ExperiencePanel() {
     <section
       className="panel record-row"
       id="experience"
-      aria-label="Expérience"
+      aria-label={t("aria.experience")}
       data-show-mark
     >
-      <p className="panel-label">Parcours</p>
+      <p className="panel-label">{t("nav.experience")}</p>
       {profile.experience.map((job) => (
         <article
           className="record-card"
@@ -129,17 +127,17 @@ export function ExperiencePanel() {
           data-motion="enter"
           key={`${job.organization}-${job.title}`}
         >
-          {job.current ? <span className="badge">Poste actuel</span> : null}
+          {job.current ? <span className="badge">{t("badge.currentJob")}</span> : null}
           <p className="record-card__period">{formatExperiencePeriod(job)}</p>
           <h3>{job.title}</h3>
           <p className="record-card__org">{job.organization}</p>
           <p className="record-card__meta">
-            {[job.employmentType, placeLabel(job.location)].filter(Boolean).join(" · ")}
+            {[job.employmentType, job.location].filter(Boolean).join(" · ")}
           </p>
           <p className="record-card__text">{job.description}</p>
           {job.skills && job.skills.length > 0 ? (
             <>
-              <p className="record-card__kicker">Compétences</p>
+              <p className="record-card__kicker">{t("skills.kicker")}</p>
               <p className="record-card__skills">{job.skills.join(" · ")}</p>
             </>
           ) : null}
@@ -156,10 +154,10 @@ export function ProjectsPanel() {
     <section
       className="panel projects-showcase"
       id="projets"
-      aria-label="Projets"
+      aria-label={t("aria.projects")}
       data-show-mark
     >
-      <p className="panel-label">Projets</p>
+      <p className="panel-label">{t("nav.projects")}</p>
       {projects.map((project, index) => {
         const image = projectVisuals[project.name] ?? fallbackVisual;
         const tone = PROJECT_TONES[index % PROJECT_TONES.length];
@@ -172,34 +170,29 @@ export function ProjectsPanel() {
             <div className="project-card__media">
               <img src={image.src} alt={image.alt} />
             </div>
-            {current ? <span className="badge">En cours</span> : null}
+            {current ? <span className="badge">{t("badge.inProgress")}</span> : null}
             <div className="project-card__body" data-scroll-y data-motion="enter">
               <div className="project-card__meta">
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <span>{projectStatusLabel[project.status]}</span>
+                <span>{projectStatusLabel(project.status)}</span>
               </div>
               <h3>{project.name}</h3>
-              <p className="project-card__role">
-                {project.role === "TODO" ? "Rôle : TODO" : project.role}
-              </p>
+              <p className="project-card__role">{project.role}</p>
               <p className="project-card__text">{project.description}</p>
-              <p className="project-card__stack">
-                {project.stack.length === 1 && project.stack[0] === "TODO"
-                  ? "Stack : TODO"
-                  : project.stack.join(" · ")}
-              </p>
-              {project.url === "TODO" ? (
-                <p className="project-card__url">Lien : TODO</p>
-              ) : (
-                <a
-                  className="project-card__url"
-                  href={project.url}
-                  target="_blank"
-                  rel="me noreferrer noopener"
-                >
-                  {project.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                </a>
-              )}
+              <p className="project-card__stack">{project.stack.join(" · ")}</p>
+              <div className="project-card__links">
+                {project.links.map((link) => (
+                  <a
+                    className="project-card__url"
+                    href={link.url}
+                    key={link.url}
+                    target="_blank"
+                    rel="me noreferrer noopener"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
             </div>
           </article>
         );
@@ -213,10 +206,10 @@ export function EducationPanel() {
     <section
       className="panel record-row"
       id="formation"
-      aria-label="Formation"
+      aria-label={t("aria.education")}
       data-show-mark
     >
-      <p className="panel-label">Formation</p>
+      <p className="panel-label">{t("nav.education")}</p>
       {profile.education.map((item) => (
         <article
           className="record-card"
@@ -224,12 +217,16 @@ export function EducationPanel() {
           data-motion="enter"
           key={`${item.school}-${item.degree}`}
         >
-          {item.current ? <span className="badge">En cours</span> : null}
+          {item.current ? <span className="badge">{t("badge.inProgress")}</span> : null}
           <p className="record-card__period">{formatEducationPeriod(item)}</p>
           <h3>{item.degree}</h3>
           {item.field ? <p className="record-card__org">{item.field}</p> : null}
           <p className="record-card__meta">{item.school}</p>
-          {item.mention ? <p className="record-card__text">Mention {item.mention}</p> : null}
+          {item.mention ? (
+            <p className="record-card__text">
+              {t("education.mention")} {item.mention}
+            </p>
+          ) : null}
           {item.notes ? <p className="record-card__text">{item.notes}</p> : null}
         </article>
       ))}
@@ -265,10 +262,10 @@ export function SkillsPanel() {
     <section
       className="panel skills"
       id="competences"
-      aria-label="Compétences"
+      aria-label={t("aria.skills")}
       data-show-mark
     >
-      <p className="panel-label">Compétences</p>
+      <p className="panel-label">{t("nav.skills")}</p>
       {profile.skills.map((group) => (
         <div className="skills__group" data-motion="enter" key={group.category}>
           <h3>{group.category}</h3>
@@ -280,7 +277,7 @@ export function SkillsPanel() {
         </div>
       ))}
       <div className="skills__group" data-motion="enter">
-        <h3>Langues</h3>
+        <h3>{t("skills.languages")}</h3>
         <ul>
           {profile.languages.map((language) => (
             <li key={language.name}>
@@ -296,8 +293,8 @@ export function SkillsPanel() {
 
 export function ContactPanel() {
   return (
-    <section className="panel contact" id="contact" aria-label="Contact" data-show-mark>
-      <p className="panel-label">Contact</p>
+    <section className="panel contact" id="contact" aria-label={t("aria.contact")} data-show-mark>
+      <p className="panel-label">{t("nav.contact")}</p>
       <div className="contact__body" data-motion="enter">
         <h2>{profile.identity.fullName}</h2>
         <p className="contact__location">{profile.identity.location}</p>
@@ -306,6 +303,17 @@ export function ContactPanel() {
         </a>
         <a className="contact__phone" href={phoneHref(profile.identity.phone)}>
           {profile.identity.phone}
+        </a>
+        <a
+          className="contact__whatsapp"
+          href={whatsappHref(profile.identity.phone)}
+          target="_blank"
+          rel="me noreferrer noopener"
+        >
+          {t("contact.whatsapp")}
+        </a>
+        <a className="contact__cv" href="/cv/yassini-jacquerel-josoa.pdf" download>
+          {t("contact.cv")}
         </a>
         <ul className="contact__links">
           {profile.links.map((link) => (

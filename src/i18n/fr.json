@@ -1,0 +1,64 @@
+{
+  "months": [
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre"
+  ],
+  "nav": {
+    "about": "Moi",
+    "experience": "Parcours",
+    "projects": "Projets",
+    "education": "Formation",
+    "skills": "Compétences",
+    "contact": "Contact"
+  },
+  "aria": {
+    "nav": "Principal",
+    "home": "Accueil",
+    "welcome": "Bienvenue",
+    "about": "À propos",
+    "profile": "Profil",
+    "experience": "Expérience",
+    "gallery": "Galerie",
+    "galleryVisual": "Galerie visuelle",
+    "projects": "Projets",
+    "education": "Formation",
+    "skills": "Compétences",
+    "contact": "Contact",
+    "scroller": "Parcours horizontal",
+    "morph": "cliquer pour morpher la typographie"
+  },
+  "badge": {
+    "currentJob": "Poste actuel",
+    "inProgress": "En cours"
+  },
+  "projectStatus": {
+    "en_cours": "En cours",
+    "termine": "Terminé"
+  },
+  "period": {
+    "since": "depuis",
+    "currentRole": "poste actuel",
+    "ongoing": "en cours"
+  },
+  "education": {
+    "mention": "Mention"
+  },
+  "skills": {
+    "languages": "Langues",
+    "kicker": "Compétences"
+  },
+  "contact": {
+    "whatsapp": "Disponible sur WhatsApp",
+    "cv": "CV"
+  }
+}
