@@ -4,7 +4,7 @@
     "brand": "JOSOA",
     "markPrefix": "jac.",
     "mark": "YASSINI",
-    "location": "Nosy-Be, Madagascar",
+    "location": "Antananarivo, Madagascar",
     "email": "josoayassinijacquerel@gmail.com",
     "phone": "+261 32 55 268 02"
   },
@@ -28,7 +28,7 @@
       "start": "2026-07",
       "end": null,
       "current": true,
-      "description": "Plateforme de gestion de kiosques mobile money (Mvola, Orange Money, Airtel Money). Backend Laravel, app Flutter offline-first, moteur de commissions à paliers, modes agent et gérant.",
+      "description": "Conception et développement d’effi’Cash : backend Laravel, application Flutter utilisable hors ligne et moteur de calcul des commissions à paliers.",
       "skills": [
         "Laravel",
         "Flutter",
@@ -44,7 +44,7 @@
       "start": "2025",
       "end": null,
       "current": true,
-      "description": "Concours artistiques malgaches et pages artistes, en ligne sur le site et Facebook."
+      "description": "Co-création de Z’Hay Awards, consacré aux concours artistiques malgaches, avec une présence sur le web et Facebook."
     },
     {
       "title": "Responsable d'équipe & développeur full-stack senior",
@@ -78,7 +78,7 @@
     {
       "name": "effi'Cash",
       "role": "Fondateur & développeur freelance",
-      "description": "Plateforme de gestion de kiosques mobile money (Mvola, Orange Money, Airtel Money). Backend Laravel, app Flutter offline-first, moteur de commissions à paliers, modes agent et gérant.",
+      "description": "Gestion de kiosques Mvola, Orange Money et Airtel Money, avec des espaces dédiés aux agents et aux gérants et un suivi des commissions.",
       "stack": [
         "Laravel",
         "Flutter",
@@ -95,7 +95,7 @@
     {
       "name": "Z'Hay Awards",
       "role": "Co-fondateur",
-      "description": "Plateforme de concours et de pages artistes.",
+      "description": "Concours en ligne et pages dédiées aux artistes malgaches pour présenter leur travail.",
       "stack": [
         "Next.js",
         "TypeScript",

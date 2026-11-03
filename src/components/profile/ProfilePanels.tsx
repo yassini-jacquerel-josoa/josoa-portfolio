@@ -11,6 +11,7 @@ import {
   phoneHref,
   profile,
   projectStatusLabel,
+  sentences,
   whatsappHref,
 } from "../../data/profile.ts";
 import { fallbackVisual, projectVisuals } from "../../data/visuals.ts";
@@ -81,7 +82,7 @@ export function AboutPanel() {
             ))}
           </h2>
           <p className="about__text" data-scroll-y data-motion="enter">
-            {profile.about}
+            {sentences(profile.about).slice(1, -1).join(" ")}
           </p>
         </div>
       </div>
