@@ -67,20 +67,22 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
     const base = container.querySelector<HTMLElement>(".collage__base img");
     const overlay = container.querySelector<HTMLElement>(".collage__overlay img");
     // Le portrait commence sur un cadrage serré (moitié du visage), puis le scroll découvre la photo entière.
-    const portraitReveal = { target: collage, enter: "left left", leave: "left 32%", sync: true as const };
-    if (collage && base) {
-      bind(
-        base,
-        { scale: [1.65, 1], ease: "inOutCubic" },
-        portraitReveal,
-      );
-    }
-    if (collage && overlay) {
-      bind(
-        overlay,
-        { opacity: [0, 1], x: ["10%", "0%"], ease: "inOutSine" },
-        portraitReveal,
-      );
+    if (collage) {
+      const portraitReveal = { target: collage, enter: "left left", leave: "left 32%", sync: true as const };
+      if (base) {
+        bind(
+          base,
+          { scale: [1.65, 1], ease: "inOutCubic" },
+          portraitReveal,
+        );
+      }
+      if (overlay) {
+        bind(
+          overlay,
+          { opacity: [0, 1], x: ["10%", "0%"], ease: "inOutSine" },
+          portraitReveal,
+        );
+      }
     }
 
     if (desktop) container.querySelectorAll<HTMLElement>(".origin__box").forEach((box, index) => {
