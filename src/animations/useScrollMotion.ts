@@ -66,13 +66,13 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
     const collage = container.querySelector<HTMLElement>(".collage");
     const base = container.querySelector<HTMLElement>(".collage__base img");
     const overlay = container.querySelector<HTMLElement>(".collage__overlay img");
-    // Le portrait démarre décalé (translate Y -40%) puis se recentre doucement au scroll.
+    // Le portrait debute cache ~20% (translate X -20%) puis se deplace au scroll (parallax).
     if (collage) {
       const portraitReveal = { target: collage, enter: "left left", leave: "left 32%", sync: true as const };
       if (base) {
         bind(
           base,
-          { x: ["-40%", "0%"], ease: "inOutSine" },
+          { x: ["-20%", "0%"], ease: "outCubic" },
           portraitReveal,
         );
       }
