@@ -10,8 +10,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    name: Validation pré-déploiement
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Configurer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+
+      - name: Linter (Oxlint)
+        run: pnpm run lint
+
+      - name: Vérifier les types TypeScript
+        run: pnpm exec tsc -b
+
+      - name: Exécuter les tests avec couverture
+        run: pnpm run test:coverage
+
+      - name: Vérifier le build
+        run: pnpm run build
+
   deploy:
     name: Build Docker sur le serveur
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - name: Construire et relancer le conteneur
