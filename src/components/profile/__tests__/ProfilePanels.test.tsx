@@ -3,9 +3,13 @@ import { render, screen } from "@testing-library/react";
 import {
   HeroPanel,
   AboutPanel,
+  PullQuotePanel,
   ExperiencePanel,
   ProjectsPanel,
   EducationPanel,
+  SkillsHighlightPanel,
+  SkillsPanel,
+  ContactPanel,
 } from "../ProfilePanels.tsx";
 import { profile } from "../../../data/profile.ts";
 
@@ -26,6 +30,13 @@ describe("<ProfilePanels />", () => {
     it("affiche la section À propos", () => {
       render(<AboutPanel />);
       expect(screen.getByRole("region", { name: /à propos/i })).toBeInTheDocument();
+    });
+  });
+
+  describe("<PullQuotePanel />", () => {
+    it("affiche le bandeau de citation / valeurs", () => {
+      render(<PullQuotePanel />);
+      expect(screen.getByRole("region", { name: /profil/i })).toBeInTheDocument();
     });
   });
 
@@ -64,6 +75,56 @@ describe("<ProfilePanels />", () => {
       profile.education.forEach((edu) => {
         expect(screen.getByRole("heading", { name: edu.degree })).toBeInTheDocument();
         expect(screen.getAllByText(edu.school).length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  describe("<SkillsHighlightPanel />", () => {
+    it("affiche les compétences clés mises en valeur", () => {
+      render(<SkillsHighlightPanel />);
+      const mainGroup = profile.skills.find((s) => s.category === "Principales") ?? profile.skills[0];
+      if (mainGroup) {
+        mainGroup.items.slice(0, 3).forEach((skill) => {
+          expect(screen.getByRole("heading", { name: skill.toLocaleUpperCase("fr-FR") })).toBeInTheDocument();
+        });
+      }
+    });
+  });
+
+  describe("<SkillsPanel />", () => {
+    it("affiche toutes les catégories de compétences et les langues", () => {
+      render(<SkillsPanel />);
+
+      profile.skills.forEach((group) => {
+        expect(screen.getByRole("heading", { name: group.category })).toBeInTheDocument();
+      });
+
+      profile.languages.forEach((lang) => {
+        expect(screen.getByText(lang.name, { exact: false })).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("<ContactPanel />", () => {
+    it("affiche les options de contact, liens directs et bouton de CV", () => {
+      render(<ContactPanel />);
+
+      expect(screen.getByRole("link", { name: profile.identity.email })).toHaveAttribute(
+        "href",
+        `mailto:${profile.identity.email}`,
+      );
+
+      const phoneLink = screen.getByRole("link", { name: profile.identity.phone });
+      expect(phoneLink).toHaveAttribute("href", expect.stringMatching(/^tel:/));
+
+      const whatsappLink = screen.getByRole("link", { name: /whatsapp/i });
+      expect(whatsappLink).toHaveAttribute("href", expect.stringMatching(/^https:\/\/wa\.me\//));
+
+      const cvLink = screen.getByRole("link", { name: /cv/i });
+      expect(cvLink).toHaveAttribute("download");
+
+      profile.links.forEach((link) => {
+        expect(screen.getByRole("link", { name: link.label })).toHaveAttribute("href", link.url);
       });
     });
   });
