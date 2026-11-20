@@ -313,7 +313,7 @@ export function ContactPanel() {
         >
           {t("contact.whatsapp")}
         </a>
-        <a className="contact__cv" href="/cv/yassini-jacquerel-josoa.pdf" download>
+        <a className="contact__cv" href="/cv/CV_JOSOA_Yassini_Jacquerel.pdf" download="CV_JOSOA_Yassini_Jacquerel.pdf">
           {t("contact.cv")}
         </a>
         <ul className="contact__links">

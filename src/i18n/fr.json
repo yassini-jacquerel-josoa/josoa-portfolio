@@ -60,5 +60,8 @@
   "contact": {
     "whatsapp": "Disponible sur WhatsApp",
     "cv": "CV"
+  },
+  "scroll": {
+    "hint": "Défiler"
   }
 }

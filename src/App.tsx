@@ -19,6 +19,7 @@ import "./App.css";
 function App() {
   const [heroShrunk, setHeroShrunk] = useState(false);
   const [markVisible, setMarkVisible] = useState(false);
+  const [scrollHint, setScrollHint] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
   useScrollMotion(scrollerRef, heroShrunk);
 
@@ -193,11 +194,58 @@ function App() {
       expected = el.scrollLeft;
     };
 
+    // Au téléphone, un glissement vertical continue le parcours horizontal.
+    type TouchDrag = { x: number; y: number; scroll: number; axis: "x" | "y" | null };
+    let drag: TouchDrag | null = null;
+
+    const verticalRoom = (node: HTMLElement, dy: number) => {
+      if (node.scrollHeight <= node.clientHeight + 1) return false;
+      const atTop = node.scrollTop <= 0;
+      const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
+      return (dy > 0 && !atTop) || (dy < 0 && !atBottom);
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (desktopMotion.matches || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      drag = { x: touch.clientX, y: touch.clientY, scroll: el.scrollLeft, axis: null };
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!drag || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const dx = touch.clientX - drag.x;
+      const dy = touch.clientY - drag.y;
+      if (drag.axis === null) {
+        if (Math.hypot(dx, dy) < 8) return;
+        drag.axis = Math.abs(dy) > Math.abs(dx) ? "y" : "x";
+      }
+      if (drag.axis !== "y") return;
+      const region = (event.target as Element | null)?.closest?.("[data-scroll-y], .nav");
+      if (region instanceof HTMLElement && verticalRoom(region, dy)) return;
+      event.preventDefault();
+      destination = null;
+      const next = clamp(drag.scroll - dy);
+      target = next;
+      expected = next;
+      el.scrollLeft = next;
+      if (raf) cancelAnimationFrame(raf);
+      running = false;
+    };
+
+    const onTouchEnd = () => {
+      drag = null;
+    };
+
     el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("pointerdown", onNavPointerDown);
     el.addEventListener("pointerup", onNavPointerUp);
     el.addEventListener("click", onNavClick);
     el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
     window.addEventListener("popstate", onPopState);
     return () => {
       el.removeEventListener("wheel", onWheel);
@@ -205,10 +253,60 @@ function App() {
       el.removeEventListener("pointerup", onNavPointerUp);
       el.removeEventListener("click", onNavClick);
       el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
       window.removeEventListener("popstate", onPopState);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
+
+  // Indication tant que le parcours n'est pas fini et que personne ne scrolle.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el || !heroShrunk) return;
+
+    let shown = false;
+    let idle = 0;
+
+    const moreToCome = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      return max > 24 && el.scrollLeft < max - 24;
+    };
+
+    const show = () => {
+      if (!moreToCome()) {
+        if (shown) {
+          shown = false;
+          setScrollHint(false);
+        }
+        return;
+      }
+      if (shown) return;
+      shown = true;
+      setScrollHint(true);
+    };
+
+    const arm = () => {
+      if (shown) {
+        shown = false;
+        setScrollHint(false);
+      }
+      window.clearTimeout(idle);
+      idle = window.setTimeout(show, 1100);
+    };
+
+    idle = window.setTimeout(show, 1600);
+    el.addEventListener("scroll", arm, { passive: true });
+    window.addEventListener("resize", arm);
+    return () => {
+      window.clearTimeout(idle);
+      el.removeEventListener("scroll", arm);
+      window.removeEventListener("resize", arm);
+      setScrollHint(false);
+    };
+  }, [heroShrunk]);
 
   // Chrome fixe (JOSOA + jac. YASSINI) dès la section about
   useEffect(() => {
@@ -304,6 +402,10 @@ function App() {
             <ContactPanel />
           </div>
         </div>
+
+        <p className={`scroll-hint${scrollHint ? " is-on" : ""}`} aria-hidden="true">
+          <span>{t("scroll.hint")}</span>
+        </p>
       </div>
     </div>
   );
