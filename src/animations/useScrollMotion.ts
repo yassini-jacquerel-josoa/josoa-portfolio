@@ -72,7 +72,7 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
       if (base) {
         bind(
           base,
-          { y: ["-40%", "0%"], ease: "inOutSine" },
+          { x: ["-40%", "0%"], ease: "inOutSine" },
           portraitReveal,
         );
       }
