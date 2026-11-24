@@ -31,10 +31,8 @@ export function HeroPanel() {
 
       <div className="hero__inner" data-scroll-y>
         <h1 className="hero__title">
-          <span className="hero__line hero__line--a">
-            <span>{bits.lineA}</span>{" "}<span>{bits.lineB}</span>
-          </span>
-          {bits.stack && <span className="hero__line hero__line--b">{bits.stack}</span>}
+          <span className="hero__line hero__line--a">{bits.lineA}</span>{" "}
+          {bits.lineB !== bits.lineA && <span className="hero__line hero__line--b">{bits.lineB}</span>}{" "}
           <span className="hero__line hero__line--c">
             {bits.prefix ? <span className="hero__lo">{bits.prefix}</span> : null}
             <span className="hero__ordinario">{bits.accent}</span>
@@ -69,7 +67,11 @@ export function AboutPanel() {
         <div className="about__content">
           <h2 className="about__title">
             {bits.aboutLines.map((line, index) => (
-              <span className={`about__line about__line--${index + 1}`} key={`${line}-${index}`}>
+              <span
+                className={`about__line about__line--${index + 1}`}
+                data-about-pin={index === 1 || index === 3 ? "" : undefined}
+                key={`${line}-${index}`}
+              >
                 {line}
               </span>
             ))}

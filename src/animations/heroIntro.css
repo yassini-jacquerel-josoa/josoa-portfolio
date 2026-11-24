@@ -1,10 +1,4 @@
 @media (min-width: 1041px) and (prefers-reduced-motion: no-preference) {
-  .collage__base img {
-    --portrait-peek-x: -8vw;
-    --portrait-peek-scale: 1.65;
-    transform: translateX(var(--portrait-peek-x)) scale(var(--portrait-peek-scale));
-  }
-
   .top-scroller--intro {
     --intro-duration: 6.7s;
     --peek-delay: 5.26s;
@@ -16,10 +10,6 @@
 
   .top-scroller--intro::-webkit-scrollbar-thumb {
     background: transparent;
-  }
-
-  .top-scroller--intro :is(.values__rail-track, .values__star) {
-    animation-play-state: paused;
   }
 
   .top-scroller--intro :is(.brand, .footer__mark, .hero__inner) {
@@ -80,27 +70,22 @@
     animation: hero-slide var(--peek-duration) var(--peek-ease) var(--peek-delay) both;
   }
 
-  /* Le portrait glisse dans son cadre pendant le retrait du papier. */
-  .top-scroller--intro .collage__base img {
-    --slide-start: 32vw;
-    will-change: translate, transform;
-    animation: hero-slide 1.18s var(--peek-ease) var(--peek-delay) both;
+  .top-scroller--intro :is(.hero__line, .hero__copy) {
+    animation: hero-text-in var(--text-duration, 760ms) var(--reveal-ease) var(--text-delay) both;
   }
 
-  .top-scroller--intro .hero__line {
-    animation: hero-title-mask 560ms var(--reveal-ease) var(--line-start) both;
-  }
-
-  .top-scroller--intro .hero__line--a { --line-start: 4.22s; }
-  .top-scroller--intro .hero__line--b { --line-start: 4.39s; }
-  .top-scroller--intro .hero__line--c { --line-start: 4.52s; }
+  .top-scroller--intro .hero__line--a { --text-delay: 4.17s; }
+  .top-scroller--intro .hero__line--b { --text-delay: 4.29s; }
+  .top-scroller--intro .hero__line--c { --text-delay: 4.41s; }
 
   .top-scroller--intro .hero__copy {
-    animation: hero-copy-mask 600ms var(--reveal-ease) 4.66s both;
+    --text-delay: 4.54s;
+    --text-duration: 840ms;
+    --text-offset: 6px;
   }
 
   .top-scroller--intro .nav {
-    animation: hero-menu-mask 880ms var(--reveal-ease) 5.66s both;
+    animation: hero-menu-in 780ms var(--reveal-ease) 5.55s both;
   }
 
   .top-scroller--intro :is(.footer__copy, .home-link) {
@@ -153,20 +138,15 @@
   }
 }
 
-@keyframes hero-title-mask {
+@keyframes hero-text-in {
   from {
-    clip-path: polygon(-42% -4%, -4% -4%, -42% 104%, -42% 104%);
-    translate: 0 7px;
+    opacity: 0;
+    translate: 0 var(--text-offset, 10px);
   }
   to {
-    clip-path: polygon(-42% -4%, 142% -4%, 104% 104%, -42% 104%);
+    opacity: 1;
     translate: 0 0;
   }
-}
-
-@keyframes hero-copy-mask {
-  from { clip-path: inset(0 0 100%); }
-  to { clip-path: inset(0); }
 }
 
 @keyframes hero-paper {
@@ -179,13 +159,15 @@
   to { translate: 0 0; }
 }
 
-@keyframes hero-menu-mask {
+@keyframes hero-menu-in {
   from {
-    clip-path: inset(0 -0.3rem 100%);
-    translate: 1.2rem 0;
+    visibility: hidden;
+    opacity: 0;
+    translate: -6px 0;
   }
   to {
-    clip-path: inset(0 -0.3rem);
+    visibility: visible;
+    opacity: 1;
     translate: 0 0;
   }
 }
