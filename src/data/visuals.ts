@@ -31,7 +31,7 @@ export const gallery = {
     alt: "Présentation effi'Cash : Pilotez vos kiosques Mobile Money du terrain au bureau",
   },
   efficashPoster: {
-    src: "/images/efficash-poster.jpg",
+    src: "/images/efficash-poster-gallery.webp",
     alt: "Affiche design de l'application effi'Cash : logo et composition typographique",
   },
   dashboard: {
@@ -39,7 +39,7 @@ export const gallery = {
     alt: "Tableau de bord affiché sur un ordinateur portable",
   },
   efficashWordmark: {
-    src: "/images/efficash-wordmark.png",
+    src: "/images/efficash-wordmark-gallery.png",
     alt: "Wordmark effi'Cash",
   },
 } as const satisfies Record<string, Visual>;

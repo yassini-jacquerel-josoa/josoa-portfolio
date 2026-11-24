@@ -76,60 +76,6 @@
   ],
   "projects": [
     {
-      "name": "effi'Cash",
-      "role": "Fondateur & développeur freelance",
-      "description": "Gestion de kiosques Mvola, Orange Money et Airtel Money, avec des espaces dédiés aux agents et aux gérants et un suivi des commissions.",
-      "stack": [
-        "Laravel",
-        "Flutter",
-        "Dart"
-      ],
-      "links": [
-        {
-          "label": "efficash.mg",
-          "url": "https://efficash.mg"
-        }
-      ],
-      "status": "en_cours"
-    },
-    {
-      "name": "Z'Hay Awards",
-      "role": "Co-fondateur",
-      "description": "Concours en ligne et pages dédiées aux artistes malgaches pour présenter leur travail.",
-      "stack": [
-        "Next.js",
-        "TypeScript",
-        "Tailwind CSS",
-        "MongoDB"
-      ],
-      "links": [
-        {
-          "label": "z-hayawards.frehyy.mg",
-          "url": "https://z-hayawards.frehyy.mg/"
-        }
-      ],
-      "status": "en_cours"
-    },
-    {
-      "name": "Wondergeorge",
-      "role": "Lead développeur",
-      "description": "SaaS de création de sites par IA. Site complet généré en moins de 45 s, traduction multilingue, blogging IA SEO.",
-      "stack": [
-        "Laravel",
-        "Livewire",
-        "FastAPI",
-        "LangChain",
-        "MySQL"
-      ],
-      "links": [
-        {
-          "label": "Site v1",
-          "url": "https://www.wonder-george.com"
-        }
-      ],
-      "status": "termine"
-    },
-    {
       "name": "SmartBots",
       "role": "Lead développeur freelance",
       "description": "Assistant IA multi-services. Orchestrateur, replay LangGraph, plugins, validation humaine.",
@@ -146,7 +92,26 @@
           "url": "https://amenitydev.com/fr/solutions/smartbots"
         }
       ],
-      "status": "termine"
+      "status": "termine",
+      "order": 1
+    },
+    {
+      "name": "effi'Cash",
+      "role": "Fondateur & développeur freelance",
+      "description": "Gestion de kiosques Mvola, Orange Money et Airtel Money, avec des espaces dédiés aux agents et aux gérants et un suivi des commissions.",
+      "stack": [
+        "Laravel",
+        "Flutter",
+        "Dart"
+      ],
+      "links": [
+        {
+          "label": "efficash.mg",
+          "url": "https://efficash.mg"
+        }
+      ],
+      "status": "en_cours",
+      "order": 2
     },
     {
       "name": "MyRacingCoach",
@@ -170,7 +135,47 @@
           "url": "https://play.google.com/store/apps/details?id=com.myracingcoach.app"
         }
       ],
-      "status": "termine"
+      "status": "termine",
+      "order": 3
+    },
+    {
+      "name": "Wondergeorge",
+      "role": "Lead développeur",
+      "description": "SaaS de création de sites par IA. Site complet généré en moins de 45 s, traduction multilingue, blogging IA SEO.",
+      "stack": [
+        "Laravel",
+        "Livewire",
+        "FastAPI",
+        "LangChain",
+        "MySQL"
+      ],
+      "links": [
+        {
+          "label": "Site v1",
+          "url": "https://www.wonder-george.com"
+        }
+      ],
+      "status": "termine",
+      "order": 4
+    },
+    {
+      "name": "Z'Hay Awards",
+      "role": "Co-fondateur",
+      "description": "Concours en ligne et pages dédiées aux artistes malgaches pour présenter leur travail.",
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "MongoDB"
+      ],
+      "links": [
+        {
+          "label": "z-hayawards.frehyy.mg",
+          "url": "https://z-hayawards.frehyy.mg/"
+        }
+      ],
+      "status": "en_cours",
+      "order": 5
     }
   ],
   "education": [
@@ -181,7 +186,8 @@
       "start": "2025-12",
       "end": null,
       "current": true,
-      "notes": "Délibération en attente. Optimisation, algorithmique, analyse numérique, traitement du signal, systèmes embarqués, réseaux."
+      "notes": "Délibération en attente. Optimisation, algorithmique, analyse numérique, traitement du signal, systèmes embarqués, réseaux.",
+      "description": "Approfondissement de l'algorithmique, de l'optimisation et du traitement du signal pour concevoir des solutions techniques fiables et performantes."
     },
     {
       "degree": "Technicien Supérieur Spécialisé",
@@ -190,7 +196,8 @@
       "start": "2021",
       "end": "2022",
       "current": false,
-      "mention": "Très Bien"
+      "mention": "Très Bien",
+      "description": "Maîtrise de l'administration de réseaux et des infrastructures, socle de la rigueur technique et de la gestion de systèmes."
     },
     {
       "degree": "Technicien Supérieur",
@@ -199,7 +206,8 @@
       "start": "2020",
       "end": "2021",
       "current": false,
-      "mention": "Très Bien"
+      "mention": "Très Bien",
+      "description": "Première immersion dans les technologies de l'information et du multimédia, fondation de la pratique du développement web et logiciel."
     },
     {
       "degree": "Baccalauréat série D",
@@ -207,16 +215,19 @@
       "start": "2018",
       "end": "2018",
       "current": false,
-      "mention": "Bien"
+      "mention": "Bien",
+      "description": "Baccalauréat scientifique, base en mathématiques et en sciences pour la suite du parcours technique."
     }
   ],
   "skills": [
     {
       "category": "Principales",
       "items": [
-        "Web",
-        "Mobile",
-        "Gestion"
+        "Architecture de produits SaaS",
+        "Conception d’API et modélisation métier",
+        "Applications mobiles hors ligne",
+        "Intégration d’agents IA et de RAG",
+        "Pilotage technique et qualité du code"
       ]
     },
     {
