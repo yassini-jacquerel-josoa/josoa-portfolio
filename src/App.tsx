@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { createDesktopScroll } from "./animations/desktopScroll";
 import { useScrollMotion } from "./animations/useScrollMotion";
 import PanelChrome from "./components/PanelChrome";
 import {
@@ -20,7 +21,6 @@ import "./animations/heroIntro.css";
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const DESKTOP = "(min-width: 1041px)";
-
 function App() {
   const [introPlaying, setIntroPlaying] = useState(() =>
     !window.location.hash &&
@@ -38,7 +38,10 @@ function App() {
   const [markVisible, setMarkVisible] = useState(false);
   const [scrollHint, setScrollHint] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
-  useScrollMotion(scrollerRef, !introPlaying);
+  const scrollStageRef = useRef<HTMLDivElement>(null);
+  const scrollContentRef = useRef<HTMLDivElement>(null);
+  const [pastOpening, setPastOpening] = useState(false);
+  useScrollMotion(scrollerRef, !introPlaying || pastOpening);
 
   // Navigation et positionnement initial avant le premier affichage.
   useLayoutEffect(() => {
@@ -50,19 +53,121 @@ function App() {
     const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
     let pointerTimer = 0;
-    let target = el.scrollLeft;
-    let expected = el.scrollLeft;
-    let raf = 0;
-    let previousFrame = 0;
-    let running = false;
-    let destination: HTMLElement | null = null;
+    let openingPassed = false;
+    let scrollMotionStart = 0;
     let pointerStartedOnHash = false;
     let handledByPointer = false;
 
-    const clamp = (value: number) => {
-      const max = el.scrollWidth - el.clientWidth;
-      return Math.min(Math.max(value, 0), Math.max(max, 0));
+    const portrait = el.querySelector<HTMLElement>(".collage");
+    const code = portrait?.querySelector<HTMLElement>(".collage__overlay");
+    const hero = el.querySelector<HTMLElement>(".hero");
+    const about = el.querySelector<HTMLElement>(".about");
+    const aboutTitle = about?.querySelector<HTMLElement>(".about__title");
+    const pinnedLines = aboutTitle?.querySelectorAll<HTMLElement>("[data-about-pin]");
+    const track = el.querySelector<HTMLElement>(".top-track");
+    const galleryPanel = el.querySelector<HTMLElement>(".origin");
+    const galleryBoxes = [...el.querySelectorAll<HTMLElement>(".origin__box")].map((node) => ({
+      node,
+      start: 0,
+      distance: 1,
+      progress: 0,
+    }));
+    let viewportWidth = 0;
+    let scrollLimit = 0;
+    let desktopScroll: ReturnType<typeof createDesktopScroll> | null = null;
+
+    const measureRail = () => {
+      viewportWidth = el.clientWidth;
+      scrollLimit = Math.max(0, el.scrollWidth - viewportWidth);
+      desktopScroll?.resize(scrollLimit, viewportWidth, el.scrollLeft);
     };
+    let portraitWidth = 0;
+    let portraitShift = 0;
+    let codeStart = 0;
+    let codeDistance = 1;
+    let codeProgress = 0;
+    let titlePinStart = 0;
+    let titlePinEnd = 0;
+    let titlePinOffset = 0;
+
+    // Intégrale du smoothstep : vitesse et accélération continues aux bornes du raccord.
+    const smoothStart = (position: number, radius: number) => {
+      if (position <= -radius) return 0;
+      if (position >= radius) return position;
+      const progress = (position + radius) / (radius * 2);
+      return radius * progress ** 3 * (2 - progress);
+    };
+
+    const syncOpening = () => {
+      if (!portrait || reduced.matches) return;
+      const left = el.scrollLeft;
+      if (desktopMotion.matches && portraitWidth > 0) {
+        // Raccord entre le portrait à 1/5 de la vitesse du Hero et la piste à pleine vitesse.
+        const offset = left - portraitWidth * 0.625;
+        const radius = portraitWidth * 0.1;
+        const shift = offset >= radius ? 0 : 0.8 * (offset - smoothStart(offset, radius));
+        if (shift !== portraitShift) {
+          portraitShift = shift;
+          portrait.style.setProperty("--portrait-shift", `${shift}px`);
+        }
+      }
+      const progress = Math.min(1, Math.max(0, (left - codeStart) / codeDistance));
+      if (progress !== codeProgress) {
+        codeProgress = progress;
+        const eased = 1 - (1 - progress) ** 4;
+        portrait.style.setProperty("--code-progress", String(eased));
+      }
+      if (!desktopMotion.matches) return;
+      if (aboutTitle && titlePinEnd > titlePinStart) {
+        const radius = Math.min(48, (titlePinEnd - titlePinStart) * 0.25);
+        const offset = smoothStart(left - titlePinStart, radius) - smoothStart(left - titlePinEnd, radius);
+        if (offset !== titlePinOffset) {
+          titlePinOffset = offset;
+          aboutTitle.style.setProperty("--about-title-pin", `${offset}px`);
+        }
+      } else if (titlePinOffset !== 0) {
+        titlePinOffset = 0;
+        aboutTitle?.style.removeProperty("--about-title-pin");
+      }
+      for (const box of galleryBoxes) {
+        const progress = Math.min(1, Math.max(0, (left - box.start) / box.distance));
+        if (progress === box.progress) continue;
+        box.progress = progress;
+        box.node.style.setProperty("--gallery-progress", String(progress * progress * (3 - 2 * progress)));
+      }
+    };
+
+    const measureOpening = () => {
+      if (!portrait || !hero) return;
+      const width = portrait.getBoundingClientRect().width;
+      portraitWidth = width;
+      const heroWidth = hero.offsetWidth;
+      scrollMotionStart = Math.max(0, heroWidth + width - viewportWidth - 180);
+      const initialPortraitLeft = desktopMotion.matches ? heroWidth - width / 2 : 0;
+      const codeRight = initialPortraitLeft + (code ? code.offsetLeft + code.offsetWidth : 0);
+      const revealSpeed = desktopMotion.matches ? 0.8 : 1;
+      codeStart = Math.max(0, (heroWidth - codeRight) / revealSpeed);
+      codeDistance = width * 0.8;
+      if (desktopMotion.matches && about && aboutTitle && pinnedLines?.length) {
+        const aboutStart = about.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft;
+        const longestLine = Math.max(...[...pinnedLines].map((line) => line.offsetWidth));
+        const available = Math.max(0, about.clientWidth - aboutTitle.offsetLeft - longestLine - 24);
+        titlePinEnd = aboutStart;
+        titlePinStart = titlePinEnd - Math.min(viewportWidth * 0.28, available);
+      }
+      if (galleryPanel && desktopMotion.matches) {
+        const origin = el.getBoundingClientRect().left - el.scrollLeft;
+        const panelStart = galleryPanel.getBoundingClientRect().left - origin - viewportWidth * 0.4;
+        for (const box of galleryBoxes) {
+          // 60 % de la section doit être visible. Le deuxième bloc attend aussi son entrée dans l'écran.
+          box.start = Math.max(panelStart, box.node.getBoundingClientRect().left - origin - viewportWidth * 0.65);
+          box.distance = viewportWidth * 0.5;
+        }
+      }
+      syncOpening();
+    };
+
+    const clamp = (value: number) => Math.min(scrollLimit, Math.max(0, value));
 
     const positionOf = (section: HTMLElement) => {
       if (section === el) return 0;
@@ -71,43 +176,32 @@ function App() {
       return clamp(left);
     };
 
-    const tick = (now: number) => {
-      const frame = 1000 / 60;
-      const elapsed = previousFrame ? now - previousFrame : frame;
-      previousFrame = now;
-      const base = desktopMotion.matches ? 0.085 : 0.14;
-      const ease = 1 - (1 - base) ** (elapsed / frame);
-      const next = expected + (target - expected) * ease;
-      const landed = Math.abs(target - next) < 0.6;
-      expected = landed ? target : next;
-      el.scrollLeft = expected;
-      if (landed) {
-        destination = null;
-        running = false;
-        raf = 0;
-        return;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
-    const start = () => {
-      if (running) return;
-      running = true;
-      previousFrame = 0;
-      raf = requestAnimationFrame(tick);
-    };
-
-    const stop = () => {
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
-      running = false;
-      destination = null;
+    const renderHorizontal = (next: number) => {
+      el.scrollLeft = next;
+      syncOpening();
     };
 
     const jumpTo = (next: number) => {
-      stop();
-      target = expected = next;
-      el.scrollLeft = next;
+      if (desktopScroll) desktopScroll.jumpTo(next);
+      else renderHorizontal(next);
+    };
+
+    const updateScrollDriver = () => {
+      const stage = scrollStageRef.current;
+      const content = scrollContentRef.current;
+      const enabled = desktopMotion.matches && !reduced.matches && stage && content;
+      if (enabled && !desktopScroll) {
+        const left = el.scrollLeft;
+        desktopScroll = createDesktopScroll(stage, content, renderHorizontal);
+        measureRail();
+        desktopScroll.jumpTo(left);
+      } else if (!enabled && desktopScroll) {
+        const left = el.scrollLeft;
+        desktopScroll.destroy();
+        desktopScroll = null;
+        measureRail();
+        renderHorizontal(clamp(left));
+      }
     };
 
     const skipIntro = () => {
@@ -144,37 +238,23 @@ function App() {
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (event.ctrlKey) return;
+      if (desktopScroll || event.ctrlKey || event.shiftKey || !event.cancelable) return;
+      if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      const delta = event.deltaY;
       const region = (event.target as Element | null)?.closest?.("[data-scroll-y], .nav");
       if (region instanceof HTMLElement && region.scrollHeight > region.clientHeight + 1) {
-        const vertical = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
         const atTop = region.scrollTop <= 0;
         const atBottom = region.scrollTop + region.clientHeight >= region.scrollHeight - 1;
-        if ((vertical < 0 && !atTop) || (vertical > 0 && !atBottom)) return;
+        if ((delta < 0 && !atTop) || (delta > 0 && !atBottom)) return;
       }
 
-      const delta =
-        Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
-      if (!delta) return;
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewportWidth : 1;
       event.preventDefault();
-      skipIntro();
-      destination = null;
-      const speed = desktopMotion.matches ? 2.05 : 2.5;
-      const next = clamp(target + delta * speed);
-      if (reduced.matches) jumpTo(next);
-      else {
-        target = next;
-        start();
-      }
+      jumpTo(clamp(el.scrollLeft + delta * unit));
     };
 
-    const navigate = (section: HTMLElement, smooth: boolean) => {
-      const next = positionOf(section);
-      if (smooth && desktopMotion.matches && !reduced.matches) {
-        destination = section;
-        target = next;
-        start();
-      } else jumpTo(next);
+    const navigate = (section: HTMLElement) => {
+      jumpTo(positionOf(section));
       focusSection(section);
     };
 
@@ -183,7 +263,7 @@ function App() {
       if (location.hash !== `#${section.id}`) {
         history.pushState(null, "", `#${section.id}`);
       }
-      navigate(section, true);
+      navigate(section);
     };
 
     const hasModifiers = (event: MouseEvent) =>
@@ -228,29 +308,31 @@ function App() {
       const section = sectionFromHash(location.hash);
       if (!section) return;
       skipIntro();
-      navigate(section, false);
+      navigate(section);
     };
 
     const onResize = () => {
+      updateScrollDriver();
+      measureRail();
+      measureOpening();
       if (!desktopMotion.matches) skipIntro();
-      if (destination) target = positionOf(destination);
     };
 
     const onMotionChange = () => {
-      if (!reduced.matches) return;
-      skipIntro();
-      jumpTo(destination ? positionOf(destination) : el.scrollLeft);
+      if (reduced.matches) skipIntro();
+      onResize();
     };
 
     const onScroll = () => {
-      if (Math.abs(el.scrollLeft - expected) < 1 || destination) return;
-      skipIntro();
-      target = el.scrollLeft;
-      expected = el.scrollLeft;
+      syncOpening();
+      if (!openingPassed && introPlayingRef.current && el.scrollLeft > scrollMotionStart) {
+        openingPassed = true;
+        setPastOpening(true);
+      }
     };
 
     // Au téléphone, un glissement vertical continue le parcours horizontal.
-    type TouchDrag = { x: number; y: number; scroll: number; axis: "x" | "y" | null };
+    type TouchDrag = { x: number; y: number; lastY: number; axis: "x" | "y" | null };
     let drag: TouchDrag | null = null;
 
     const verticalRoom = (node: HTMLElement, dy: number) => {
@@ -263,24 +345,25 @@ function App() {
     const onTouchStart = (event: TouchEvent) => {
       if (desktopMotion.matches || event.touches.length !== 1) return;
       const touch = event.touches[0];
-      drag = { x: touch.clientX, y: touch.clientY, scroll: el.scrollLeft, axis: null };
+      drag = { x: touch.clientX, y: touch.clientY, lastY: touch.clientY, axis: null };
     };
 
     const onTouchMove = (event: TouchEvent) => {
       if (!drag || event.touches.length !== 1) return;
       const touch = event.touches[0];
       const dx = touch.clientX - drag.x;
-      const dy = touch.clientY - drag.y;
+      const dy = touch.clientY - drag.lastY;
+      drag.lastY = touch.clientY;
       if (drag.axis === null) {
-        if (Math.hypot(dx, dy) < 8) return;
-        drag.axis = Math.abs(dy) > Math.abs(dx) ? "y" : "x";
+        const totalY = touch.clientY - drag.y;
+        if (Math.hypot(dx, totalY) < 8) return;
+        drag.axis = Math.abs(totalY) > Math.abs(dx) ? "y" : "x";
       }
-      if (drag.axis !== "y") return;
+      if (drag.axis !== "y" || !dy) return;
       const region = (event.target as Element | null)?.closest?.("[data-scroll-y], .nav");
       if (region instanceof HTMLElement && verticalRoom(region, dy)) return;
       event.preventDefault();
-      skipIntro();
-      jumpTo(clamp(drag.scroll - dy));
+      jumpTo(clamp(el.scrollLeft - dy));
     };
 
     const onTouchEnd = () => {
@@ -303,8 +386,19 @@ function App() {
     window.addEventListener("resize", onResize);
     reduced.addEventListener("change", onMotionChange);
 
+    updateScrollDriver();
+    measureRail();
+    const railObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => {
+      measureRail();
+      measureOpening();
+    });
+    railObserver?.observe(el);
+    if (track) railObserver?.observe(track);
+    pinnedLines?.forEach((line) => railObserver?.observe(line));
+
     const initialSection = location.hash ? sectionFromHash(location.hash) : null;
-    if (initialSection) navigate(initialSection, false);
+    if (initialSection) navigate(initialSection);
+    measureOpening();
     return () => {
       el.removeEventListener("focusin", skipIntro);
       document.removeEventListener("keydown", onKeyDown, true);
@@ -322,8 +416,13 @@ function App() {
       window.removeEventListener("resize", onResize);
       reduced.removeEventListener("change", onMotionChange);
       window.clearTimeout(pointerTimer);
+      railObserver?.disconnect();
+      desktopScroll?.destroy();
       history.scrollRestoration = previousRestoration;
-      stop();
+      portrait?.style.removeProperty("--portrait-shift");
+      portrait?.style.removeProperty("--code-progress");
+      aboutTitle?.style.removeProperty("--about-title-pin");
+      galleryBoxes.forEach(({ node }) => node.style.removeProperty("--gallery-progress"));
     };
   }, []);
 
@@ -396,86 +495,92 @@ function App() {
   }, []);
 
   return (
-    <div className="page">
-      <div className="top-box">
-        <PanelChrome
-          variant="mark"
-          visible={markVisible}
-          className="panel-chrome--fixed"
-        />
+    <div className="scroll-stage" ref={scrollStageRef}>
+      <div className="scroll-stage__content" ref={scrollContentRef}>
+        <div className="page">
+          <div className="top-box">
+            <PanelChrome
+              variant="mark"
+              visible={markVisible}
+              className="panel-chrome--fixed"
+            />
 
-        <div
-          className={`top-scroller${introPlaying ? " top-scroller--intro" : ""}`}
-          ref={scrollerRef}
-          id="top"
-          aria-label={t("aria.scroller")}
-        >
-          <div
-            className="top-track"
-            onAnimationEnd={(event) => {
-              if (event.animationName === "hero-last-labels") finishIntro();
-            }}
-          >
-            <HeroPanel />
+            <div
+              className={`top-scroller${introPlaying ? " top-scroller--intro" : ""}`}
+              ref={scrollerRef}
+              id="top"
+              aria-label={t("aria.scroller")}
+            >
+              <div
+                className="top-track"
+                onAnimationEnd={(event) => {
+                  if (event.animationName === "hero-last-labels") finishIntro();
+                }}
+              >
+                <div className="opening-panels">
+                  <HeroPanel />
 
-            <section className="panel collage" aria-label={t("aria.galleryVisual")}>
-              <div className="collage__base">
-                <img src={gallery.portrait.src} alt={gallery.portrait.alt} />
-              </div>
-              <div className="collage__overlay">
-                <img src={gallery.code.src} alt={gallery.code.alt} />
-              </div>
-            </section>
-
-            <AboutPanel />
-
-            <section className="panel origin" aria-label={t("aria.gallery")} data-show-mark>
-              <div className="origin__boxes">
-                <div className="origin__box origin__box--a">
-                  <div className="origin__stack">
-                    <img
-                      className="origin__img origin__img--back"
-                      src={gallery.efficashPoster.src}
-                      alt={gallery.efficashPoster.alt}
-                    />
-                    <img
-                      className="origin__img origin__img--front"
-                      src={gallery.efficashLanding.src}
-                      alt={gallery.efficashLanding.alt}
-                    />
-                  </div>
+                  <section className="panel collage" aria-label={t("aria.galleryVisual")}>
+                    <div className="collage__base">
+                      <img src={gallery.portrait.src} alt={gallery.portrait.alt} />
+                    </div>
+                    <div className="collage__overlay">
+                      <img src={gallery.code.src} alt={gallery.code.alt} />
+                    </div>
+                  </section>
                 </div>
 
-                <div className="origin__box origin__box--b">
-                  <div className="origin__stack">
-                    <img
-                      className="origin__img origin__img--back"
-                      src={gallery.efficashWordmark.src}
-                      alt={gallery.efficashWordmark.alt}
-                    />
-                    <img
-                      className="origin__img origin__img--front"
-                      src={gallery.dashboard.src}
-                      alt={gallery.dashboard.alt}
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
+                <AboutPanel />
 
-            <PullQuotePanel />
-            <ExperiencePanel />
-            <ProjectsPanel />
-            <EducationPanel />
-            <SkillsHighlightPanel />
-            <SkillsPanel />
-            <ContactPanel />
+                <section className="panel origin" aria-label={t("aria.gallery")} data-show-mark>
+                  <div className="origin__boxes">
+                    <div className="origin__box origin__box--a">
+                      <div className="origin__stack">
+                        <img
+                          className="origin__img origin__img--back"
+                          src={gallery.efficashPoster.src}
+                          alt={gallery.efficashPoster.alt}
+                        />
+                        <img
+                          className="origin__img origin__img--front"
+                          src={gallery.efficashLanding.src}
+                          alt={gallery.efficashLanding.alt}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="origin__box origin__box--b">
+                      <div className="origin__stack">
+                        <img
+                          className="origin__img origin__img--back"
+                          src={gallery.efficashWordmark.src}
+                          alt={gallery.efficashWordmark.alt}
+                        />
+                        <img
+                          className="origin__img origin__img--front"
+                          src={gallery.dashboard.src}
+                          alt={gallery.dashboard.alt}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <PullQuotePanel />
+                <ExperiencePanel />
+                <ProjectsPanel />
+                <EducationPanel />
+                <SkillsHighlightPanel />
+                <SkillsPanel />
+                <ContactPanel />
+              </div>
+            </div>
+
+            <p className={`scroll-hint${scrollHint ? " is-on" : ""}`} aria-hidden="true">
+              <span>{t("scroll.hint")}</span>
+            </p>
           </div>
         </div>
-
-        <p className={`scroll-hint${scrollHint ? " is-on" : ""}`} aria-hidden="true">
-          <span>{t("scroll.hint")}</span>
-        </p>
       </div>
     </div>
   );

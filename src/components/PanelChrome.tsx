@@ -49,7 +49,7 @@ export default function PanelChrome({
         <nav className="nav" aria-label={t("aria.nav")}>
           <ul>
             {navItems.map((item) => (
-              <li key={item.label}>
+              <li key={item.href}>
                 <a href={item.href}>{item.label}</a>
               </li>
             ))}

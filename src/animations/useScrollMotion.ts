@@ -3,7 +3,6 @@ import { animate, onScroll, stagger } from "animejs";
 
 const ENTER = "right left";
 const CROSS = "left right";
-const REVEAL = "center center";
 const ARRIVE = "68% start";
 /** Même seuil que la mise en page tablette/téléphone dans App.css */
 const DESKTOP_MOTION = "(min-width: 1041px)";
@@ -60,56 +59,14 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
       animations.push(animate(list, { ease: "inOutSine", ...parameters, autoplay: observer }));
     };
 
-    const collage = container.querySelector<HTMLElement>(".collage");
-    const base = container.querySelector<HTMLElement>(".collage__base img");
-    const overlay = container.querySelector<HTMLElement>(".collage__overlay img");
-    // Le portrait debute cache ~20% (translate X -20%) puis se deplace au scroll (parallax).
-    if (collage) {
-      const portraitReveal = { target: collage, enter: "left left", leave: "left 32%", sync: true as const };
-      if (base) {
-        const framing = desktop ? getComputedStyle(base) : null;
-        const peekX = framing?.getPropertyValue("--portrait-peek-x").trim();
-        const peekScale = Number(framing?.getPropertyValue("--portrait-peek-scale")) || 1.65;
-        bind(
-          base,
-          desktop
-            ? { x: [peekX || "-8vw", "0vw"], scale: [peekScale, 1], ease: "inOutCubic" }
-            : { x: ["-20%", "0%"], ease: "outCubic" },
-          portraitReveal,
-        );
-      }
-      if (overlay) {
-        bind(
-          overlay,
-          { opacity: [0, 1], x: ["10%", "0%"], ease: "inOutSine" },
-          portraitReveal,
-        );
-      }
+    const values = container.querySelector<HTMLElement>(".values");
+    const rail = values?.querySelector<HTMLElement>(".values__rail-track");
+    if (values && rail) {
+      const accelerate = (progress: number) => progress * (0.65 + 0.35 * progress);
+      bind(rail, { y: ["0%", "-100%"], ease: accelerate }, { target: values });
+      const stars = [...rail.querySelectorAll<HTMLElement>(".values__star")];
+      bind(stars, { rotate: [0, 720], ease: accelerate }, { target: values });
     }
-
-    if (desktop) container.querySelectorAll<HTMLElement>(".origin__box").forEach((box, index) => {
-      const back = box.querySelector<HTMLElement>(".origin__img--back");
-      const front = box.querySelector<HTMLElement>(".origin__img--front");
-      if (back) {
-        bind(
-          back,
-          {
-            x: index === 0 ? ["-8%", "9%"] : ["8%", "-10%"],
-            y: index === 0 ? ["4%", "-5%"] : ["-4%", "6%"],
-            scale: [1.14, 1.04],
-            ease: "linear",
-          },
-          { target: box, sync: "inOutSine" },
-        );
-      }
-      if (front) {
-        bind(
-          front,
-          { x: ["0%", "108%"], ease: "inOutSine" },
-          { target: box, enter: ENTER, leave: REVEAL },
-        );
-      }
-    });
 
     if (desktop) {
       const about = container.querySelector<HTMLElement>(".about");

@@ -30,6 +30,9 @@ describe("<ProfilePanels />", () => {
     it("affiche la section À propos", () => {
       render(<AboutPanel />);
       expect(screen.getByRole("region", { name: /à propos/i })).toBeInTheDocument();
+      expect(screen.getByText("Senior")).toHaveAttribute("data-about-pin");
+      expect(screen.getByText("IA & SaaS")).toHaveAttribute("data-about-pin");
+      expect(screen.getByText("Fullstack")).not.toHaveAttribute("data-about-pin");
     });
   });
 
