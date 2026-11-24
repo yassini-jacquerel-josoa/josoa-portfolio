@@ -914,6 +914,17 @@
   will-change: transform;
 }
 
+/* Visuel transparent (PNG) : affiché entier et centré, sans recadrage.
+   Le fond de la carte transparaît derrière le PNG (background-color du CSS). */
+.project-card__media img.project-card__img--contain {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  object-fit: contain;
+  will-change: auto;
+}
+
 .project-card .badge {
   position: absolute;
   top: 1rem;

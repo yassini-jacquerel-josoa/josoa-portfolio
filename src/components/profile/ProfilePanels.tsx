@@ -162,7 +162,11 @@ export function ProjectsPanel() {
             key={project.name}
           >
             <div className="project-card__media">
-              <img src={image.src} alt={image.alt} />
+              <img
+                src={image.src}
+                alt={image.alt}
+                className={image.fit === "contain" ? "project-card__img--contain" : undefined}
+              />
             </div>
             {current ? <span className="badge">{t("badge.inProgress")}</span> : null}
             <div className="project-card__body" data-scroll-y data-motion="enter">

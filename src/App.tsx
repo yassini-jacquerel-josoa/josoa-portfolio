@@ -420,7 +420,7 @@ function App() {
 
             <section className="panel collage" aria-label={t("aria.galleryVisual")}>
               <div className="collage__base">
-                <img src={gallery.workspace.src} alt={gallery.workspace.alt} />
+                <img src={gallery.portrait.src} alt={gallery.portrait.alt} />
               </div>
               <div className="collage__overlay">
                 <img src={gallery.code.src} alt={gallery.code.alt} />
@@ -435,13 +435,13 @@ function App() {
                   <div className="origin__stack">
                     <img
                       className="origin__img origin__img--back"
-                      src={gallery.architecture.src}
-                      alt={gallery.architecture.alt}
+                      src={gallery.efficashPoster.src}
+                      alt={gallery.efficashPoster.alt}
                     />
                     <img
                       className="origin__img origin__img--front"
-                      src={gallery.mobile.src}
-                      alt={gallery.mobile.alt}
+                      src={gallery.efficashLanding.src}
+                      alt={gallery.efficashLanding.alt}
                     />
                   </div>
                 </div>
@@ -450,8 +450,8 @@ function App() {
                   <div className="origin__stack">
                     <img
                       className="origin__img origin__img--back"
-                      src={gallery.stage.src}
-                      alt={gallery.stage.alt}
+                      src={gallery.efficashWordmark.src}
+                      alt={gallery.efficashWordmark.alt}
                     />
                     <img
                       className="origin__img origin__img--front"
