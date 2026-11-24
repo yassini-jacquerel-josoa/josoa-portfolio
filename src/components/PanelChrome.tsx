@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { profile } from "../data/profile.ts";
 import { t } from "../i18n/index.ts";
 import FontMorph from "./FontMorph";
@@ -31,6 +32,7 @@ export default function PanelChrome({
     <div
       className={`panel-chrome panel-chrome--${variant}${visible ? " is-visible" : ""}${className ? ` ${className}` : ""}`}
       aria-hidden={isMark ? !visible : undefined}
+      inert={isMark && !visible}
     >
       <header className="brand">
         <FontMorph
@@ -63,7 +65,21 @@ export default function PanelChrome({
         )}
         <div className="footer__mark">
           <span className="footer__is">{profile.identity.markPrefix}</span>
-          <span className="footer__boring">{profile.identity.mark}</span>
+          {isMark ? (
+            <span className="footer__boring">{profile.identity.mark}</span>
+          ) : (
+            <span className="footer__boring" role="img" aria-label={profile.identity.mark}>
+              {Array.from(profile.identity.mark, (letter, index) => (
+                <span
+                  key={index}
+                  aria-hidden="true"
+                  style={{ "--glyph-index": index } as CSSProperties}
+                >
+                  {letter}
+                </span>
+              ))}
+            </span>
+          )}
         </div>
       </div>
     </div>

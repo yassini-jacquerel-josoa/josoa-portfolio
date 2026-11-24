@@ -20,7 +20,7 @@ vi.mock("../../FontMorph.tsx", () => ({
 describe("<ProfilePanels />", () => {
   describe("<HeroPanel />", () => {
     it("affiche le nom complet et la localisation", () => {
-      render(<HeroPanel shrunk={false} />);
+      render(<HeroPanel />);
       expect(screen.getAllByText(profile.identity.fullName, { exact: false }).length).toBeGreaterThan(0);
       expect(screen.getAllByText(profile.identity.location, { exact: false }).length).toBeGreaterThan(0);
     });
