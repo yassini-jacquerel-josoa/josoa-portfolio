@@ -13,6 +13,8 @@
 export type Visual = {
   src: string;
   alt: string;
+  /** Visuel transparent (PNG) : affiché entier et centré, sans recadrage. */
+  fit?: "contain";
 };
 
 export const gallery = {
@@ -44,24 +46,25 @@ export const gallery = {
 
 export const projectVisuals: Record<string, Visual> = {
   "effi'Cash": {
-    src: "/images/payment.jpg",
-    alt: "Paiement sans contact sur un téléphone",
+    src: "/images/efficash-app.jpg",
+    alt: "Application effi'Cash de saisie des dépôts Mobile Money (Mvola, Orange Money, Airtel Money)",
   },
   "Z'Hay Awards": {
-    src: "/images/concert.jpg",
-    alt: "Foule face à une scène de concert",
+    src: "/images/zhay-awards.jpg",
+    alt: "Accueil du site Z'Hay Awards, concours d'artistes malgaches",
   },
   Wondergeorge: {
     src: "/images/devices.jpg",
     alt: "Écrans d’ordinateur, de tablette et de téléphone",
   },
   SmartBots: {
-    src: "/images/circuit.jpg",
-    alt: "Carte électronique en gros plan",
+    src: "/images/smartbots.jpg",
+    alt: "Interface de SmartBots avec la sélection de neuf agents spécialisés",
   },
   MyRacingCoach: {
-    src: "/images/kart.jpg",
-    alt: "Karting sur un circuit",
+    src: "/images/myracingcoach.png",
+    alt: "Mockup de l’application MyRacingCoach de coaching karting sur tablette et iPhone",
+    fit: "contain",
   },
 };
 
