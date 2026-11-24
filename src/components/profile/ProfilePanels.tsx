@@ -19,14 +19,11 @@ import { fallbackVisual, projectVisuals } from "../../data/visuals.ts";
 const PROJECT_TONES = ["tone-0", "tone-1", "tone-2"] as const;
 const HIGHLIGHT_ROWS = ["one", "two", "three"] as const;
 
-export function HeroPanel({ shrunk }: { shrunk: boolean }) {
+export function HeroPanel() {
   const bits = headlineBits(profile.headline);
 
   return (
-    <section
-      className={`panel hero${shrunk ? " hero--shrunk" : ""}`}
-      aria-label={t("aria.home")}
-    >
+    <section className="panel hero" aria-label={t("aria.home")}>
       <PanelChrome variant="hero" />
       <a className="home-link" href="#top">
         {t("aria.welcome")}
@@ -34,8 +31,10 @@ export function HeroPanel({ shrunk }: { shrunk: boolean }) {
 
       <div className="hero__inner" data-scroll-y>
         <h1 className="hero__title">
-          <span className="hero__line hero__line--a">{bits.lineA}</span>
-          <span className="hero__line hero__line--b">{bits.lineB}</span>
+          <span className="hero__line hero__line--a">
+            <span>{bits.lineA}</span>{" "}<span>{bits.lineB}</span>
+          </span>
+          {bits.stack && <span className="hero__line hero__line--b">{bits.stack}</span>}
           <span className="hero__line hero__line--c">
             {bits.prefix ? <span className="hero__lo">{bits.prefix}</span> : null}
             <span className="hero__ordinario">{bits.accent}</span>
@@ -46,12 +45,6 @@ export function HeroPanel({ shrunk }: { shrunk: boolean }) {
           {profile.identity.fullName}
           <br />
           {profile.identity.location}
-          {bits.stack ? (
-            <>
-              <br />
-              {bits.stack}
-            </>
-          ) : null}
           <br />
           <br />
           {firstSentence(profile.about)}

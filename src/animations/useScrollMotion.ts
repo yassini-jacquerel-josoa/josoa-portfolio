@@ -1,5 +1,5 @@
 import { useEffect, type RefObject } from "react";
-import { animate, onScroll, stagger, type ScrollObserver } from "animejs";
+import { animate, onScroll, stagger } from "animejs";
 
 const ENTER = "right left";
 const CROSS = "left right";
@@ -10,12 +10,12 @@ const DESKTOP_MOTION = "(min-width: 1041px)";
 
 /**
  * Parallax et entrées du mode ordinateur, liées au scroll horizontal.
- * Le hero se rétracte en 1,4 s : on recalcule les seuils pendant cette transition.
+ * Les observateurs sont montés après la chorégraphie du Hero.
  */
 export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready: boolean) {
   useEffect(() => {
     const container = rootRef.current;
-    if (!container || !ready) return;
+    if (!ready || !container) return;
 
     const desktop = window.matchMedia(DESKTOP_MOTION);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -41,8 +41,6 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
 function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
 
     const animations: Array<ReturnType<typeof animate>> = [];
-    const observers: ScrollObserver[] = [];
-    let alive = true;
 
     const bind = (
       targets: HTMLElement | HTMLElement[],
@@ -59,7 +57,6 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
         leave: range.leave ?? CROSS,
         target: range.target,
       });
-      observers.push(observer);
       animations.push(animate(list, { ease: "inOutSine", ...parameters, autoplay: observer }));
     };
 
@@ -70,9 +67,16 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
     if (collage) {
       const portraitReveal = { target: collage, enter: "left left", leave: "left 32%", sync: true as const };
       if (base) {
+        const framing = desktop ? getComputedStyle(base) : null;
+        const peekX = framing?.getPropertyValue("--portrait-peek-x").trim();
+        const peekScale = Number(framing?.getPropertyValue("--portrait-peek-scale")) || 1.65;
         bind(
           base,
-          { scale: [1.65, 1], ease: "inOutCubic" },
+          {
+            ...(peekX ? { x: [peekX, "0vw"] } : {}),
+            scale: [peekScale, 1],
+            ease: "inOutCubic",
+          },
           portraitReveal,
         );
       }
@@ -161,39 +165,7 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
       });
     }
 
-    const refresh = () => {
-      if (!alive) return;
-      observers[0]?.container.refresh();
-    };
-
-    let tracking = true;
-    const track = () => {
-      refresh();
-      if (tracking && alive) requestAnimationFrame(track);
-    };
-    const stopTracking = () => {
-      tracking = false;
-      refresh();
-    };
-
-    const hero = container.querySelector<HTMLElement>(".hero");
-    const onHeroEnd = (event: TransitionEvent) => {
-      if (event.target !== hero) return;
-      if (event.propertyName !== "flex-basis" && event.propertyName !== "width") return;
-      stopTracking();
-    };
-
-    hero?.addEventListener("transitionend", onHeroEnd);
-    window.addEventListener("resize", refresh);
-    const timeout = window.setTimeout(stopTracking, 1800);
-    requestAnimationFrame(track);
-
     return () => {
-      alive = false;
-      tracking = false;
-      window.clearTimeout(timeout);
-      hero?.removeEventListener("transitionend", onHeroEnd);
-      window.removeEventListener("resize", refresh);
       for (const animation of animations) animation.revert();
     };
 }

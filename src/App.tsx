@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useScrollMotion } from "./animations/useScrollMotion";
 import PanelChrome from "./components/PanelChrome";
 import {
@@ -15,28 +16,44 @@ import {
 import { gallery } from "./data/visuals";
 import { t } from "./i18n/index.ts";
 import "./App.css";
+import "./animations/heroIntro.css";
+
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+const DESKTOP = "(min-width: 1041px)";
 
 function App() {
-  const [heroShrunk, setHeroShrunk] = useState(false);
+  const [introPlaying, setIntroPlaying] = useState(() =>
+    !window.location.hash &&
+    window.matchMedia(DESKTOP).matches &&
+    !window.matchMedia(REDUCED_MOTION).matches,
+  );
+  const introPlayingRef = useRef(introPlaying);
+
+  const finishIntro = () => {
+    if (!introPlayingRef.current) return;
+    introPlayingRef.current = false;
+    setIntroPlaying(false);
+  };
+
   const [markVisible, setMarkVisible] = useState(false);
   const [scrollHint, setScrollHint] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
-  useScrollMotion(scrollerRef, heroShrunk);
+  useScrollMotion(scrollerRef, !introPlaying);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setHeroShrunk(true), 3_000);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  // Molette → scroll horizontal rapide + lissé (lerp)
-  useEffect(() => {
+  // Navigation et positionnement initial avant le premier affichage.
+  useLayoutEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
 
-    const desktopMotion = window.matchMedia("(min-width: 1041px)");
+    const desktopMotion = window.matchMedia(DESKTOP);
+    const reduced = window.matchMedia(REDUCED_MOTION);
+    const previousRestoration = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    let pointerTimer = 0;
     let target = el.scrollLeft;
     let expected = el.scrollLeft;
     let raf = 0;
+    let previousFrame = 0;
     let running = false;
     let destination: HTMLElement | null = null;
     let pointerStartedOnHash = false;
@@ -54,25 +71,17 @@ function App() {
       return clamp(left);
     };
 
-    const heroIsMoving = () => {
-      const hero = el.querySelector(".hero");
-      if (!hero) return false;
-      return hero.getAnimations().some((animation) => animation.playState === "running");
-    };
-
-    const tick = () => {
-      if (destination) target = positionOf(destination);
-      const ease = desktopMotion.matches ? 0.085 : 0.14;
-      const current = el.scrollLeft;
-      const next = current + (target - current) * ease;
-      const landed = Math.abs(target - current) < 0.6;
+    const tick = (now: number) => {
+      const frame = 1000 / 60;
+      const elapsed = previousFrame ? now - previousFrame : frame;
+      previousFrame = now;
+      const base = desktopMotion.matches ? 0.085 : 0.14;
+      const ease = 1 - (1 - base) ** (elapsed / frame);
+      const next = expected + (target - expected) * ease;
+      const landed = Math.abs(target - next) < 0.6;
       expected = landed ? target : next;
       el.scrollLeft = expected;
       if (landed) {
-        if (destination && heroIsMoving()) {
-          raf = requestAnimationFrame(tick);
-          return;
-        }
         destination = null;
         running = false;
         raf = 0;
@@ -84,25 +93,58 @@ function App() {
     const start = () => {
       if (running) return;
       running = true;
+      previousFrame = 0;
       raf = requestAnimationFrame(tick);
+    };
+
+    const stop = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      running = false;
+      destination = null;
+    };
+
+    const jumpTo = (next: number) => {
+      stop();
+      target = expected = next;
+      el.scrollLeft = next;
+    };
+
+    const skipIntro = () => {
+      if (!introPlayingRef.current) return;
+      introPlayingRef.current = false;
+      flushSync(() => setIntroPlaying(false));
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Tab") skipIntro();
+    };
+
+    const sectionFromHash = (hash: string) => {
+      let id: string;
+      try {
+        id = decodeURIComponent(hash.slice(1));
+      } catch {
+        return null;
+      }
+      const section = id ? document.getElementById(id) : el;
+      return section && (section === el || el.contains(section)) ? section : null;
     };
 
     const hashLinkFrom = (event: Event) => {
       const link = (event.target as Element | null)?.closest?.("a[href^='#']");
       if (!(link instanceof HTMLAnchorElement) || !el.contains(link)) return null;
-      const id = link.getAttribute("href")?.slice(1);
-      const section = id ? document.getElementById(id) : null;
-      if (!section || (section !== el && !el.contains(section))) return null;
-      return { link, section };
+      return sectionFromHash(link.hash);
     };
 
     const focusSection = (section: HTMLElement) => {
       const focusTarget = section === el ? el.querySelector<HTMLElement>(".hero") ?? el : section;
-      if (focusTarget.tabIndex < 0) focusTarget.tabIndex = -1;
+      if (focusTarget.tabIndex < 0) focusTarget.setAttribute("tabindex", "-1");
       focusTarget.focus({ preventScroll: true });
     };
 
     const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey) return;
       const region = (event.target as Element | null)?.closest?.("[data-scroll-y], .nav");
       if (region instanceof HTMLElement && region.scrollHeight > region.clientHeight + 1) {
         const vertical = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
@@ -115,34 +157,40 @@ function App() {
         Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
       if (!delta) return;
       event.preventDefault();
+      skipIntro();
       destination = null;
       const speed = desktopMotion.matches ? 2.05 : 2.5;
-      target = clamp(target + delta * speed);
-      start();
+      const next = clamp(target + delta * speed);
+      if (reduced.matches) jumpTo(next);
+      else {
+        target = next;
+        start();
+      }
+    };
+
+    const navigate = (section: HTMLElement, smooth: boolean) => {
+      const next = positionOf(section);
+      if (smooth && desktopMotion.matches && !reduced.matches) {
+        destination = section;
+        target = next;
+        start();
+      } else jumpTo(next);
+      focusSection(section);
     };
 
     const visit = (section: HTMLElement) => {
-      focusSection(section);
-      const next = positionOf(section);
+      skipIntro();
       if (location.hash !== `#${section.id}`) {
         history.pushState(null, "", `#${section.id}`);
       }
-      if (!desktopMotion.matches) {
-        destination = null;
-        target = next;
-        expected = next;
-        el.scrollLeft = next;
-        if (raf) cancelAnimationFrame(raf);
-        running = false;
-        return;
-      }
-      destination = section;
-      target = next;
-      start();
+      navigate(section, true);
     };
 
+    const hasModifiers = (event: MouseEvent) =>
+      event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
+
     const onNavPointerDown = (event: PointerEvent) => {
-      if (event.button !== 0) return;
+      if (event.button !== 0 || hasModifiers(event)) return;
       const match = hashLinkFrom(event);
       if (!match) return;
       // Le lien du menu vit dans le hero. S'il prend le focus, le navigateur
@@ -157,13 +205,15 @@ function App() {
       const match = hashLinkFrom(event);
       if (!match) return;
       handledByPointer = true;
-      window.setTimeout(() => {
+      window.clearTimeout(pointerTimer);
+      pointerTimer = window.setTimeout(() => {
         handledByPointer = false;
       }, 0);
-      visit(match.section);
+      visit(match);
     };
 
     const onNavClick = (event: MouseEvent) => {
+      if (hasModifiers(event)) return;
       const match = hashLinkFrom(event);
       if (!match) return;
       event.preventDefault();
@@ -171,25 +221,30 @@ function App() {
         handledByPointer = false;
         return;
       }
-      visit(match.section);
+      visit(match);
     };
 
-    const onPopState = () => {
-      const id = location.hash.slice(1);
-      const section = id ? document.getElementById(id) : el;
-      if (!section || (section !== el && !el.contains(section))) return;
-      focusSection(section);
-      destination = desktopMotion.matches ? section : null;
-      target = positionOf(section);
-      if (destination) start();
-      else {
-        expected = target;
-        el.scrollLeft = target;
-      }
+    const onLocationChange = () => {
+      const section = sectionFromHash(location.hash);
+      if (!section) return;
+      skipIntro();
+      navigate(section, false);
+    };
+
+    const onResize = () => {
+      if (!desktopMotion.matches) skipIntro();
+      if (destination) target = positionOf(destination);
+    };
+
+    const onMotionChange = () => {
+      if (!reduced.matches) return;
+      skipIntro();
+      jumpTo(destination ? positionOf(destination) : el.scrollLeft);
     };
 
     const onScroll = () => {
       if (Math.abs(el.scrollLeft - expected) < 1 || destination) return;
+      skipIntro();
       target = el.scrollLeft;
       expected = el.scrollLeft;
     };
@@ -224,19 +279,16 @@ function App() {
       const region = (event.target as Element | null)?.closest?.("[data-scroll-y], .nav");
       if (region instanceof HTMLElement && verticalRoom(region, dy)) return;
       event.preventDefault();
-      destination = null;
-      const next = clamp(drag.scroll - dy);
-      target = next;
-      expected = next;
-      el.scrollLeft = next;
-      if (raf) cancelAnimationFrame(raf);
-      running = false;
+      skipIntro();
+      jumpTo(clamp(drag.scroll - dy));
     };
 
     const onTouchEnd = () => {
       drag = null;
     };
 
+    el.addEventListener("focusin", skipIntro);
+    document.addEventListener("keydown", onKeyDown, true);
     el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("pointerdown", onNavPointerDown);
     el.addEventListener("pointerup", onNavPointerUp);
@@ -246,8 +298,16 @@ function App() {
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd);
     el.addEventListener("touchcancel", onTouchEnd);
-    window.addEventListener("popstate", onPopState);
+    window.addEventListener("popstate", onLocationChange);
+    window.addEventListener("hashchange", onLocationChange);
+    window.addEventListener("resize", onResize);
+    reduced.addEventListener("change", onMotionChange);
+
+    const initialSection = location.hash ? sectionFromHash(location.hash) : null;
+    if (initialSection) navigate(initialSection, false);
     return () => {
+      el.removeEventListener("focusin", skipIntro);
+      document.removeEventListener("keydown", onKeyDown, true);
       el.removeEventListener("wheel", onWheel);
       el.removeEventListener("pointerdown", onNavPointerDown);
       el.removeEventListener("pointerup", onNavPointerUp);
@@ -257,15 +317,20 @@ function App() {
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
       el.removeEventListener("touchcancel", onTouchEnd);
-      window.removeEventListener("popstate", onPopState);
-      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("popstate", onLocationChange);
+      window.removeEventListener("hashchange", onLocationChange);
+      window.removeEventListener("resize", onResize);
+      reduced.removeEventListener("change", onMotionChange);
+      window.clearTimeout(pointerTimer);
+      history.scrollRestoration = previousRestoration;
+      stop();
     };
   }, []);
 
   // Indication tant que le parcours n'est pas fini et que personne ne scrolle.
   useEffect(() => {
     const el = scrollerRef.current;
-    if (!el || !heroShrunk) return;
+    if (!el || introPlaying) return;
 
     let shown = false;
     let idle = 0;
@@ -306,7 +371,7 @@ function App() {
       window.removeEventListener("resize", arm);
       setScrollHint(false);
     };
-  }, [heroShrunk]);
+  }, [introPlaying]);
 
   // Chrome fixe (JOSOA + jac. YASSINI) dès la section about
   useEffect(() => {
@@ -340,13 +405,18 @@ function App() {
         />
 
         <div
-          className={`top-scroller${heroShrunk ? " top-scroller--open" : ""}`}
+          className={`top-scroller${introPlaying ? " top-scroller--intro" : ""}`}
           ref={scrollerRef}
           id="top"
           aria-label={t("aria.scroller")}
         >
-          <div className="top-track">
-            <HeroPanel shrunk={heroShrunk} />
+          <div
+            className="top-track"
+            onAnimationEnd={(event) => {
+              if (event.animationName === "hero-last-labels") finishIntro();
+            }}
+          >
+            <HeroPanel />
 
             <section className="panel collage" aria-label={t("aria.galleryVisual")}>
               <div className="collage__base">
