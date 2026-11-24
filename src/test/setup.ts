@@ -31,6 +31,19 @@ if (typeof window !== "undefined" && !window.matchMedia) {
   }));
 }
 
+if (typeof ResizeObserver === "undefined") {
+  vi.stubGlobal("ResizeObserver", class {
+    observe = vi.fn();
+    disconnect = vi.fn();
+  });
+}
+
+if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function () {
+    this.open = true;
+  };
+}
+
 afterEach(() => {
   cleanup();
 });

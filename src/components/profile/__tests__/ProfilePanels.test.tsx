@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import {
   HeroPanel,
   AboutPanel,
@@ -62,11 +62,15 @@ describe("<ProfilePanels />", () => {
         expect(screen.getByRole("heading", { name: proj.name })).toBeInTheDocument();
       });
 
-      const links = screen.getAllByRole("link");
+      const project = profile.projects.find((item) => item.links.length > 0);
+      expect(project).toBeDefined();
+      if (!project) return;
+      fireEvent.click(screen.getByRole("button", { name: `Voir le projet ${project.name}` }));
+      const dialog = screen.getByRole("dialog", { name: project.name });
+      const links = within(dialog).getAllByRole("link");
       links.forEach((link) => {
-        if (link.getAttribute("target") === "_blank") {
-          expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
-        }
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
       });
     });
   });
@@ -83,14 +87,10 @@ describe("<ProfilePanels />", () => {
   });
 
   describe("<SkillsHighlightPanel />", () => {
-    it("affiche les compétences clés mises en valeur", () => {
+    it("affiche les étapes de développement dans l’ordre", () => {
       render(<SkillsHighlightPanel />);
-      const mainGroup = profile.skills.find((s) => s.category === "Principales") ?? profile.skills[0];
-      if (mainGroup) {
-        mainGroup.items.slice(0, 3).forEach((skill) => {
-          expect(screen.getByRole("heading", { name: skill.toLocaleUpperCase("fr-FR") })).toBeInTheDocument();
-        });
-      }
+      const steps = screen.getAllByRole("heading").map((heading) => heading.textContent);
+      expect(steps).toEqual(["Architecture", "Implémentation", "Validation"]);
     });
   });
 

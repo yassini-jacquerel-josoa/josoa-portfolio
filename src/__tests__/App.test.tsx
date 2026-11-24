@@ -56,6 +56,7 @@ describe("<App />", () => {
       const wheel = new WheelEvent("wheel", { deltaY: 120, bubbles: true, cancelable: true });
       scroller.dispatchEvent(wheel);
       expect(createDesktopScroll).toHaveBeenCalledOnce();
+      expect(vi.mocked(createDesktopScroll).mock.calls[0][3]).toBe(0.64);
       expect(wheel.defaultPrevented).toBe(false);
       jumpTo.mockClear();
 
@@ -80,7 +81,7 @@ describe("<App />", () => {
       scroller.dispatchEvent(wheel);
       expect(createDesktopScroll).not.toHaveBeenCalled();
       expect(wheel.defaultPrevented).toBe(true);
-      expect(scroller.scrollLeft).toBe(120);
+      expect(scroller.scrollLeft).toBe(76.8);
     } finally {
       unmount();
       vi.restoreAllMocks();

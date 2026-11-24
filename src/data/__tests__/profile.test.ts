@@ -97,6 +97,16 @@ describe("src/data/profile helpers", () => {
       const ordered = orderedProjects(projects);
       expect(ordered.map((p) => p.name)).toEqual(["P2", "P4", "P1", "P3"]);
     });
+
+    it("trie les projets selon leur ordre explicite", () => {
+      const projects = [
+        { name: "P1", status: "termine" as const, order: 3 },
+        { name: "P2", status: "en_cours" as const, order: 1 },
+        { name: "P3", status: "termine" as const, order: 2 },
+      ];
+      const ordered = orderedProjects(projects);
+      expect(ordered.map((p) => p.name)).toEqual(["P2", "P3", "P1"]);
+    });
   });
 
   describe("projectStatusLabel", () => {
