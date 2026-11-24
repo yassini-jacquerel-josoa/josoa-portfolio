@@ -7,17 +7,14 @@ import {
   formatExperiencePeriod,
   headlineBits,
   lastSentence,
-  orderedProjects,
   phoneHref,
   profile,
-  projectStatusLabel,
   sentences,
   whatsappHref,
 } from "../../data/profile.ts";
-import { fallbackVisual, projectVisuals } from "../../data/visuals.ts";
 
-const PROJECT_TONES = ["tone-0", "tone-1", "tone-2"] as const;
-const HIGHLIGHT_ROWS = ["one", "two", "three"] as const;
+export { default as ProjectsPanel } from "./ProjectsPanel.tsx";
+const DEVELOPMENT_STEPS = ["architecture", "implementation", "validation"] as const;
 
 export function HeroPanel() {
   const bits = headlineBits(profile.headline);
@@ -143,64 +140,6 @@ export function ExperiencePanel() {
   );
 }
 
-export function ProjectsPanel() {
-  const projects = orderedProjects(profile.projects);
-
-  return (
-    <section
-      className="panel projects-showcase"
-      id="projets"
-      aria-label={t("aria.projects")}
-      data-show-mark
-    >
-      <p className="panel-label">{t("nav.projects")}</p>
-      {projects.map((project, index) => {
-        const image = projectVisuals[project.name] ?? fallbackVisual;
-        const tone = PROJECT_TONES[index % PROJECT_TONES.length];
-        const current = project.status === "en_cours";
-        return (
-          <article
-            className={`project-card project-card--${tone}${current ? " project-card--current" : ""}`}
-            key={project.name}
-          >
-            <div className="project-card__media">
-              <img
-                src={image.src}
-                alt={image.alt}
-                className={image.fit === "contain" ? "project-card__img--contain" : undefined}
-              />
-            </div>
-            {current ? <span className="badge">{t("badge.inProgress")}</span> : null}
-            <div className="project-card__body" data-scroll-y data-motion="enter">
-              <div className="project-card__meta">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <span>{projectStatusLabel(project.status)}</span>
-              </div>
-              <h3>{project.name}</h3>
-              <p className="project-card__role">{project.role}</p>
-              <p className="project-card__text">{project.description}</p>
-              <p className="project-card__stack">{project.stack.join(" · ")}</p>
-              <div className="project-card__links">
-                {project.links.map((link) => (
-                  <a
-                    className="project-card__url"
-                    href={link.url}
-                    key={link.url}
-                    target="_blank"
-                    rel="me noreferrer noopener"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </article>
-        );
-      })}
-    </section>
-  );
-}
-
 export function EducationPanel() {
   return (
     <section
@@ -222,6 +161,7 @@ export function EducationPanel() {
           <h3>{item.degree}</h3>
           {item.field ? <p className="record-card__org">{item.field}</p> : null}
           <p className="record-card__meta">{item.school}</p>
+          {item.description ? <p className="record-card__text">{item.description}</p> : null}
           {item.mention ? (
             <p className="record-card__text">
               {t("education.mention")} {item.mention}
@@ -235,24 +175,14 @@ export function EducationPanel() {
 }
 
 export function SkillsHighlightPanel() {
-  const group =
-    profile.skills.find((item) => item.category === "Principales") ?? profile.skills[0];
-  if (!group) return null;
-
   return (
-    <section className="panel principles" data-show-mark aria-label={group.category}>
-      {group.items.slice(0, 3).map((skill, index) => (
-        <div
-          className={`principles__row principles__row--${HIGHLIGHT_ROWS[index] ?? "one"}`}
-          key={skill}
-        >
+    <section className="panel principles" data-show-mark aria-label={t("principles.label")}>
+      {DEVELOPMENT_STEPS.map((step, index) => (
+        <div className="principles__row" key={step}>
           <span className="principles__index">0{index + 1}</span>
-          <h2>{skill.toLocaleUpperCase("fr-FR")}</h2>
+          <h2>{t(`principles.${step}`)}</h2>
         </div>
       ))}
-      <p className="principles__copy" data-motion="enter">
-        {profile.headline}
-      </p>
     </section>
   );
 }
@@ -266,26 +196,28 @@ export function SkillsPanel() {
       data-show-mark
     >
       <p className="panel-label">{t("nav.skills")}</p>
-      {profile.skills.map((group) => (
-        <div className="skills__group" data-motion="enter" key={group.category}>
-          <h3>{group.category}</h3>
+      <div className="skills__grid" data-scroll-y>
+        {profile.skills.map((group) => (
+          <div className="skills__group" data-motion="enter" key={group.category}>
+            <h3>{group.category}</h3>
+            <ul>
+              {group.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <div className="skills__group" data-motion="enter">
+          <h3>{t("skills.languages")}</h3>
           <ul>
-            {group.items.map((item) => (
-              <li key={item}>{item}</li>
+            {profile.languages.map((language) => (
+              <li key={language.name}>
+                {language.name}
+                <span className="skills__level"> {language.level}</span>
+              </li>
             ))}
           </ul>
         </div>
-      ))}
-      <div className="skills__group" data-motion="enter">
-        <h3>{t("skills.languages")}</h3>
-        <ul>
-          {profile.languages.map((language) => (
-            <li key={language.name}>
-              {language.name}
-              <span className="skills__level"> {language.level}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

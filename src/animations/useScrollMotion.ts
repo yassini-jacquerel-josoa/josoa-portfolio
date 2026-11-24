@@ -1,5 +1,5 @@
 import { useEffect, type RefObject } from "react";
-import { animate, onScroll, stagger } from "animejs";
+import { animate, onScroll } from "animejs";
 
 const ENTER = "right left";
 const CROSS = "left right";
@@ -9,12 +9,11 @@ const DESKTOP_MOTION = "(min-width: 1041px)";
 
 /**
  * Parallax et entrées du mode ordinateur, liées au scroll horizontal.
- * Les observateurs sont montés après la chorégraphie du Hero.
  */
-export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready: boolean) {
+export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const container = rootRef.current;
-    if (!ready || !container) return;
+    if (!container) return;
 
     const desktop = window.matchMedia(DESKTOP_MOTION);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -34,7 +33,7 @@ export function useScrollMotion(rootRef: RefObject<HTMLDivElement | null>, ready
       reduced.removeEventListener("change", mount);
       stop();
     };
-  }, [ready, rootRef]);
+  }, [rootRef]);
 }
 
 function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
@@ -69,44 +68,17 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
     }
 
     if (desktop) {
-      const about = container.querySelector<HTMLElement>(".about");
-      const aboutLines = [...container.querySelectorAll<HTMLElement>(".about__line")];
-      if (about && aboutLines.length > 0) {
-        bind(
-          aboutLines,
-          {
-            y: [32, 0],
-            opacity: [0, 1],
-            delay: stagger(120),
-            duration: 900,
-            ease: "outCubic",
-          },
-          { target: about, enter: ENTER, leave: "68% start" },
-        );
-      }
-
-      container.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
-        const image = card.querySelector<HTMLElement>(".project-card__media img");
-        // Les visuels « contain » (PNG transparents) restent centrés, sans parallaxe.
-        if (!image || image.classList.contains("project-card__img--contain")) return;
-        bind(
-          image,
-          { x: ["12%", "-10%"], scale: [1.2, 1.03], ease: "linear" },
-          { target: card, sync: "inOutSine" },
-        );
-      });
-
       const principles = container.querySelector<HTMLElement>(".principles");
       if (principles) {
         const shifts: Array<[string, string]> = [
-          ["5vw", "-7vw"],
-          ["-4vw", "8vw"],
-          ["6vw", "-4vw"],
+          ["1rem", "-1rem"],
+          ["-1rem", "1rem"],
+          ["1rem", "-0.5rem"],
         ];
         container.querySelectorAll<HTMLElement>(".principles__row").forEach((row, index) => {
           bind(
             row,
-            { x: shifts[index] ?? ["2vw", "-2vw"], ease: "linear" },
+            { x: shifts[index] ?? ["0rem", "0rem"], ease: "linear" },
             { target: principles, sync: "inOutSine" },
           );
         });

@@ -6,6 +6,7 @@ export function createDesktopScroll(
   stage: HTMLElement,
   content: HTMLElement,
   renderHorizontal: (left: number) => void,
+  scrollSpeed: number,
 ) {
   gsap.registerPlugin(ScrollTrigger);
   stage.classList.add("scroll-stage--driven");
@@ -59,7 +60,9 @@ export function createDesktopScroll(
   return {
     resize(limit: number, width: number, left: number) {
       // Le parcours source dépend de la largeur de la piste et de la hauteur visible.
-      const distance = limit && width ? Math.round((limit + width) * stage.clientHeight / width) : 0;
+      const distance = limit && width
+        ? Math.round((limit + width) * stage.clientHeight / (width * scrollSpeed))
+        : 0;
       if (distance === verticalLimit && limit === horizontalLimit) return;
       horizontalLimit = limit;
       verticalLimit = distance;

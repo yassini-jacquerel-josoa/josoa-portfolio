@@ -45,6 +45,11 @@
     "en_cours": "En cours",
     "termine": "Terminé"
   },
+  "projects": {
+    "view": "Voir le projet",
+    "close": "Fermer",
+    "selectionsHint": "Voici une sélection de mes projets."
+  },
   "period": {
     "since": "depuis",
     "currentRole": "poste actuel",
@@ -56,6 +61,12 @@
   "skills": {
     "languages": "Langues",
     "kicker": "Compétences"
+  },
+  "principles": {
+    "label": "Étapes de développement",
+    "architecture": "Architecture",
+    "implementation": "Implémentation",
+    "validation": "Validation"
   },
   "contact": {
     "whatsapp": "Disponible sur WhatsApp",
