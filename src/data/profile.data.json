@@ -8,8 +8,8 @@
     "email": "josoayassinijacquerel@gmail.com",
     "phone": "+261 32 55 268 02"
   },
-  "headline": "Développeur Senior | Laravel · Flutter · React Native | IA & SaaS",
-  "about": "Développeur senior avec plus de 6 ans d'expérience, spécialisé en architecture logicielle, Laravel et produits web à forte valeur métier. J'interviens sur des projets complexes, from scratch ou en reprise d'existant, avec un code robuste, lisible et maintenable. Je mêle PHP, Python et IA appliquée (LangChain, LangGraph). Côté mobile, je livre des applications React Native (Expo) et Flutter, dont certaines publiées sur Google Play et l'App Store. Je pars du terrain, je livre simple, puis j'itère.",
+  "headline": "Développeur Senior | Backend · Web · Mobile | IA & SaaS",
+  "about": "Développeur logiciel senior avec plus de 6 ans d'expérience, je conçois et développe des applications web, mobiles et des logiciels de gestion. J'aime comprendre les besoins des utilisateurs, livrer une première solution simple, puis l'améliorer à partir de leurs retours. Je travaille principalement sur le backend, avec PHP (Laravel), Node.js et Python. Je développe aussi des interfaces web avec React et TypeScript, ainsi que des applications mobiles avec Flutter et React Native. Je suis ouvert aux opportunités en développement backend, full-stack ou mobile, sur place ou à distance.",
   "experience": [
     {
       "title": "Consultant en développement",
@@ -214,15 +214,16 @@
     {
       "category": "Principales",
       "items": [
-        "Laravel",
-        "React Native",
-        "Flutter"
+        "Web",
+        "Mobile",
+        "Gestion"
       ]
     },
     {
       "category": "Backend",
       "items": [
         "PHP 8",
+        "Laravel",
         "Python",
         "FastAPI",
         "API REST",
@@ -237,6 +238,8 @@
         "Dart",
         "TypeScript",
         "Firebase",
+        "React Native",
+        "Flutter",
         "Expo",
         "OneSignal",
         "RevenueCat"
