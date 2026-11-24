@@ -128,7 +128,8 @@ function attachScrollMotion(container: HTMLDivElement, desktop: boolean) {
 
       container.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
         const image = card.querySelector<HTMLElement>(".project-card__media img");
-        if (!image) return;
+        // Les visuels « contain » (PNG transparents) restent centrés, sans parallaxe.
+        if (!image || image.classList.contains("project-card__img--contain")) return;
         bind(
           image,
           { x: ["12%", "-10%"], scale: [1.2, 1.03], ease: "linear" },
