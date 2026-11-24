@@ -1,7 +1,7 @@
 // Morph chaque lettre de "JOSOA" entre deux polices, en interpolant
 // les contours vectoriels (paths SVG) extraits via opentype.js.
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import opentype from "opentype.js";
 import flubber from "flubber";
 import { t } from "../i18n/index.ts";
@@ -32,6 +32,46 @@ async function loadFont(url: string) {
   return opentype.parse(buffer);
 }
 
+const glyphsCache = new Map<string, Promise<LetterPaths[]>>();
+
+async function prepareGlyphs(text: string, fontAUrl: string, fontBUrl: string, fontSize: number) {
+  const [fontA, fontB] = await Promise.all([
+    loadFont(fontAUrl),
+    loadFont(fontBUrl),
+  ]);
+
+  const unitsPerEm = fontA.unitsPerEm || 1000;
+  const scale = fontSize / unitsPerEm;
+
+  return Array.from(text, (char) => {
+    const glyphA = fontA.charToGlyph(char);
+    const glyphB = fontB.charToGlyph(char);
+
+    const pathA = glyphA.getPath(0, 0, fontSize).toPathData(2);
+    const pathB = glyphB.getPath(0, 0, fontSize).toPathData(2);
+
+    let morph: ((t: number) => string) | null = null;
+    if (pathA && pathB) {
+      try {
+        morph = interpolate(pathA, pathB, { maxSegmentLength: 4 });
+      } catch {
+        morph = null;
+      }
+    }
+
+    const width =
+      Math.max(glyphA.advanceWidth ?? 0, glyphB.advanceWidth ?? 0) * scale;
+
+    return {
+      char,
+      pathA,
+      pathB,
+      width: Math.max(width, fontSize * 0.35),
+      morph,
+    };
+  });
+}
+
 export default function FontMorph({
   text = "JOSOA",
   fontAUrl,
@@ -44,68 +84,38 @@ export default function FontMorph({
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const logoRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number | null>(null);
   const progressRef = useRef(0);
 
-  useEffect(() => {
-    progressRef.current = progress;
-  }, [progress]);
+  const targetRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadFonts() {
-      setLoading(true);
-      setFailed(false);
+    setLoading(true);
+    setFailed(false);
 
-      const [fontA, fontB] = await Promise.all([
-        loadFont(fontAUrl),
-        loadFont(fontBUrl),
-      ]);
-
-      const unitsPerEm = fontA.unitsPerEm || 1000;
-      const scale = fontSize / unitsPerEm;
-
-      const result: LetterPaths[] = text.split("").map((char) => {
-        const glyphA = fontA.charToGlyph(char);
-        const glyphB = fontB.charToGlyph(char);
-
-        const pathA = glyphA.getPath(0, 0, fontSize).toPathData(2);
-        const pathB = glyphB.getPath(0, 0, fontSize).toPathData(2);
-
-        let morph: ((t: number) => string) | null = null;
-        if (pathA && pathB) {
-          try {
-            morph = interpolate(pathA, pathB, { maxSegmentLength: 4 });
-          } catch {
-            morph = null;
-          }
-        }
-
-        const width =
-          Math.max(glyphA.advanceWidth ?? 0, glyphB.advanceWidth ?? 0) * scale;
-
-        return {
-          char,
-          pathA,
-          pathB,
-          width: Math.max(width, fontSize * 0.35),
-          morph,
-        };
+    // Les deux marques partagent les mêmes contours et interpolateurs.
+    const key = JSON.stringify([text, fontAUrl, fontBUrl, fontSize]);
+    let glyphs = glyphsCache.get(key);
+    if (!glyphs) {
+      glyphs = prepareGlyphs(text, fontAUrl, fontBUrl, fontSize).catch((error) => {
+        glyphsCache.delete(key);
+        throw error;
       });
-
-      if (!cancelled) {
-        setLetters(result);
-        setLoading(false);
-      }
+      glyphsCache.set(key, glyphs);
     }
 
-    loadFonts().catch((err) => {
-      console.error("Erreur de chargement des polices:", err);
-      if (!cancelled) {
-        setFailed(true);
-        setLoading(false);
-      }
+    glyphs.then((result) => {
+      if (cancelled) return;
+      setLetters(result);
+      setLoading(false);
+    }).catch((error) => {
+      if (cancelled) return;
+      console.error("Erreur de chargement des polices:", error);
+      setFailed(true);
+      setLoading(false);
     });
 
     return () => {
@@ -114,10 +124,36 @@ export default function FontMorph({
   }, [text, fontAUrl, fontBUrl, fontSize]);
 
   useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finish = () => {
+      if (!reduced.matches || animRef.current === null) return;
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+      progressRef.current = targetRef.current;
+      setProgress(targetRef.current);
+    };
+    reduced.addEventListener("change", finish);
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
+      reduced.removeEventListener("change", finish);
+      if (animRef.current !== null) cancelAnimationFrame(animRef.current);
     };
   }, []);
+
+  useLayoutEffect(() => {
+    // Les contours SVG peuvent remplacer le texte pendant le dévoilement.
+    // Chaque lettre reprend alors le temps de la chorégraphie en cours.
+    const logo = logoRef.current;
+    const flight = logo?.parentElement?.getAnimations().find(
+      (animation) =>
+        animation instanceof CSSAnimation && animation.animationName === "hero-brand-flight",
+    );
+    if (typeof flight?.startTime !== "number") return;
+    for (const animation of logo?.getAnimations({ subtree: true }) ?? []) {
+      if (animation instanceof CSSAnimation && animation.animationName === "hero-glyph") {
+        animation.startTime = flight.startTime;
+      }
+    }
+  }, [letters]);
 
   const svgWidth = useMemo(
     () => letters.reduce((sum, l) => sum + l.width, 0) + 24,
@@ -126,7 +162,14 @@ export default function FontMorph({
   const svgHeight = fontSize * 1.35;
 
   function morphTo(target: number) {
-    if (animRef.current) cancelAnimationFrame(animRef.current);
+    targetRef.current = target;
+    if (animRef.current !== null) cancelAnimationFrame(animRef.current);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      animRef.current = null;
+      progressRef.current = target;
+      setProgress(target);
+      return;
+    }
     const start = progressRef.current;
     const startTime = performance.now();
 
@@ -138,7 +181,7 @@ export default function FontMorph({
       setProgress(next);
       if (t < 1) {
         animRef.current = requestAnimationFrame(step);
-      }
+      } else animRef.current = null;
     }
     animRef.current = requestAnimationFrame(step);
   }
@@ -151,6 +194,7 @@ export default function FontMorph({
   // Toujours le même wrapper : la taille vient uniquement du CSS (.brand__morph)
   return (
     <div
+      ref={logoRef}
       className={className}
       onClick={handleClick}
       onKeyDown={(e) => {
@@ -166,7 +210,17 @@ export default function FontMorph({
       style={{ cursor: failed ? "default" : "pointer", userSelect: "none" }}
     >
       {loading || failed || letters.length === 0 ? (
-        <span className="font-morph__fallback">{text}</span>
+        <span className="font-morph__fallback" aria-hidden="true">
+          {Array.from(text, (char, index) => (
+            <span
+              className="font-morph__glyph"
+              key={index}
+              style={{ "--glyph-index": index } as CSSProperties}
+            >
+              {char}
+            </span>
+          ))}
+        </span>
       ) : (
         <svg
           className="font-morph__svg"
@@ -186,7 +240,9 @@ export default function FontMorph({
 
               const el = (
                 <path
+                  className="font-morph__glyph"
                   key={`${letter.char}-${i}`}
+                  style={{ "--glyph-index": i } as CSSProperties}
                   d={d || letter.pathA}
                   transform={`translate(${x}, ${fontSize * 0.95})`}
                   fill="currentColor"

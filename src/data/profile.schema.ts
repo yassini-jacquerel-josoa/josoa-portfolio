@@ -39,6 +39,7 @@ const projectSchema = z.strictObject({
   status: z.enum(["en_cours", "termine"], {
     error: "statut en_cours ou termine obligatoire",
   }),
+  order: z.number().int().optional(),
 });
 
 const educationSchema = z.strictObject({
@@ -48,6 +49,7 @@ const educationSchema = z.strictObject({
   start: yearMonth,
   end: z.union([yearMonth, z.null()]),
   current: z.boolean({ error: "champ obligatoire" }),
+  description: requiredText.optional(),
   mention: requiredText.optional(),
   notes: requiredText.optional(),
 });

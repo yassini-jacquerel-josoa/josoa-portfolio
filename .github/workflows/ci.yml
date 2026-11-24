@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, Types, Tests & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Configurer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+
+      - name: Linter (Oxlint)
+        run: pnpm run lint
+
+      - name: Vérifier les types TypeScript
+        run: pnpm exec tsc -b
+
+      - name: Exécuter les tests avec couverture
+        run: pnpm run test:coverage
+
+      - name: Construire pour la production
+        run: pnpm run build

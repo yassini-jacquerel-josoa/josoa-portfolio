@@ -115,11 +115,18 @@ export function cityOf(location: string): string {
   return city?.trim() || location;
 }
 
-export function orderedProjects<T extends { status: Project["status"] }>(items: readonly T[]): T[] {
+export function orderedProjects<T extends { status: Project["status"]; order?: number }>(items: readonly T[]): T[] {
+  const rank = (status: T["status"]) => (status === "en_cours" ? 0 : 1);
   return items
     .map((item, index) => ({ item, index }))
     .sort((left, right) => {
-      const rank = (status: T["status"]) => (status === "en_cours" ? 0 : 1);
+      const leftOrder = left.item.order;
+      const rightOrder = right.item.order;
+      if (leftOrder !== undefined || rightOrder !== undefined) {
+        const byOrder =
+          (leftOrder ?? Number.POSITIVE_INFINITY) - (rightOrder ?? Number.POSITIVE_INFINITY);
+        if (byOrder !== 0) return byOrder;
+      }
       const byStatus = rank(left.item.status) - rank(right.item.status);
       return byStatus === 0 ? left.index - right.index : byStatus;
     })

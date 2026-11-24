@@ -1,0 +1,178 @@
+@media (min-width: 1041px) and (prefers-reduced-motion: no-preference) {
+  .top-scroller--intro {
+    --intro-duration: 6.7s;
+    --peek-delay: 5.26s;
+    --peek-duration: 1.10s;
+    --peek-ease: cubic-bezier(0.42, 0, 0.24, 1);
+    --reveal-ease: cubic-bezier(0.32, 0, 0.25, 1);
+    scrollbar-color: transparent transparent;
+  }
+
+  .top-scroller--intro::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
+  .top-scroller--intro :is(.brand, .footer__mark, .hero__inner) {
+    will-change: translate;
+  }
+
+  .top-scroller--intro .hero {
+    --lockup-edge: clamp(4.1rem, 8vw, 10rem);
+    overflow: visible;
+  }
+
+  /* Le panneau mesure déjà 80 vw. Cette extension masque le début du portrait. */
+  .top-scroller--intro .hero::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 0 auto 0 100%;
+    width: 20vw;
+    background: var(--paper);
+    transform-origin: left;
+    pointer-events: none;
+    will-change: transform;
+    animation: hero-paper var(--peek-duration) var(--peek-ease) var(--peek-delay) both;
+  }
+
+  .top-scroller--intro .brand {
+    --brand-start-x: calc(50vw - var(--brand-left) + var(--lockup-edge) - clamp(3.5rem, 5vw, 6.25rem) - 100%);
+    --brand-start-y: calc(50svh - var(--brand-top) - 50%);
+    animation: hero-brand-flight var(--intro-duration) linear both;
+  }
+
+  .top-scroller--intro .footer__mark {
+    --mark-start-x: calc(var(--lockup-edge) + var(--footer-inset) - 30vw);
+    --mark-start-y: calc(-50svh + var(--footer-bottom) + 100% - 0.35rem);
+    animation: hero-signature-flight var(--intro-duration) linear both;
+  }
+
+  .top-scroller--intro .font-morph__fallback .font-morph__glyph {
+    display: inline-block;
+  }
+
+  .top-scroller--intro .font-morph__glyph {
+    animation: hero-glyph 250ms var(--reveal-ease) calc(330ms + var(--glyph-index) * 65ms) both;
+  }
+
+  .top-scroller--intro .footer__is {
+    animation: hero-glyph 200ms var(--reveal-ease) 840ms both;
+  }
+
+  .top-scroller--intro .footer__boring > span {
+    animation: hero-glyph 290ms var(--reveal-ease) calc(1040ms + var(--glyph-index) * 57ms) both;
+  }
+
+  .top-scroller--intro .hero__inner {
+    position: relative;
+    z-index: 2;
+    --slide-start: 10vw;
+    animation: hero-slide var(--peek-duration) var(--peek-ease) var(--peek-delay) both;
+  }
+
+  .top-scroller--intro :is(.hero__line, .hero__copy) {
+    animation: hero-text-in var(--text-duration, 760ms) var(--reveal-ease) var(--text-delay) both;
+  }
+
+  .top-scroller--intro .hero__line--a { --text-delay: 4.17s; }
+  .top-scroller--intro .hero__line--b { --text-delay: 4.29s; }
+  .top-scroller--intro .hero__line--c { --text-delay: 4.41s; }
+
+  .top-scroller--intro .hero__copy {
+    --text-delay: 4.54s;
+    --text-duration: 840ms;
+    --text-offset: 6px;
+  }
+
+  .top-scroller--intro .nav {
+    animation: hero-menu-in 780ms var(--reveal-ease) 5.55s both;
+  }
+
+  .top-scroller--intro :is(.footer__copy, .home-link) {
+    animation: hero-last-labels 720ms ease-out 5.98s both;
+  }
+}
+
+/* Sur 6,7 s : départ horizontal à 2,70 s, pause de 3,62 à 4,13 s,
+   puis déplacement vertical. La signature partage la courbe du papier. */
+@keyframes hero-brand-flight {
+  0%, 40.3% {
+    translate: var(--brand-start-x) var(--brand-start-y);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.30, 1);
+  }
+  54.03%, 61.64% {
+    translate: 0 var(--brand-start-y);
+    animation-timing-function: cubic-bezier(0.36, 0, 0.24, 1);
+  }
+  75.37%, 100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes hero-signature-flight {
+  0%, 40.3% {
+    translate: var(--mark-start-x) var(--mark-start-y);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.30, 1);
+  }
+  54.03%, 61.64% {
+    translate: 20vw var(--mark-start-y);
+    animation-timing-function: cubic-bezier(0.36, 0, 0.24, 1);
+  }
+  75.37%, 78.51% {
+    translate: 20vw 0;
+    animation-timing-function: cubic-bezier(0.42, 0, 0.24, 1);
+  }
+  94.93%, 100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes hero-glyph {
+  from {
+    clip-path: inset(-8% 108% -8% -8%) fill-box;
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(-8%) fill-box;
+    opacity: 1;
+  }
+}
+
+@keyframes hero-text-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--text-offset, 10px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes hero-paper {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes hero-slide {
+  from { translate: var(--slide-start) 0; }
+  to { translate: 0 0; }
+}
+
+@keyframes hero-menu-in {
+  from {
+    visibility: hidden;
+    opacity: 0;
+    translate: -6px 0;
+  }
+  to {
+    visibility: visible;
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes hero-last-labels {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
