@@ -35,6 +35,7 @@
     "skills": "Compétences",
     "contact": "Contact",
     "scroller": "Parcours horizontal",
+    "mobileScroller": "Parcours vertical",
     "morph": "cliquer pour morpher la typographie"
   },
   "badge": {
