@@ -15,6 +15,9 @@ import {
 
 export { default as ProjectsPanel } from "./ProjectsPanel.tsx";
 const DEVELOPMENT_STEPS = ["architecture", "implementation", "validation"] as const;
+const contactLinks = profile.links.filter(
+  ({ url }) => !["efficash.mg", "z-hayawards.frehyy.mg"].includes(new URL(url).hostname),
+);
 
 export function HeroPanel() {
   const bits = headlineBits(profile.headline);
@@ -60,7 +63,7 @@ export function AboutPanel() {
       data-show-mark
     >
       <div className="about__box">
-        <p className="about__label">{t("nav.about")}</p>
+        <p className="about__label" data-motion="mobile-enter">{t("nav.about")}</p>
         <div className="about__content">
           <h2 className="about__title">
             {bits.aboutLines.map((line, index) => (
@@ -69,7 +72,7 @@ export function AboutPanel() {
                 data-about-pin={index === 1 || index === 3 ? "" : undefined}
                 key={`${line}-${index}`}
               >
-                {line}
+                <span className="about__line-text">{line}</span>
               </span>
             ))}
           </h2>
@@ -112,7 +115,7 @@ export function ExperiencePanel() {
       aria-label={t("aria.experience")}
       data-show-mark
     >
-      <p className="panel-label">{t("nav.experience")}</p>
+      <p className="panel-label" data-motion="mobile-enter">{t("nav.experience")}</p>
       {profile.experience.map((job) => (
         <article
           className="record-card"
@@ -148,7 +151,7 @@ export function EducationPanel() {
       aria-label={t("aria.education")}
       data-show-mark
     >
-      <p className="panel-label">{t("nav.education")}</p>
+      <p className="panel-label" data-motion="mobile-enter">{t("nav.education")}</p>
       {profile.education.map((item) => (
         <article
           className="record-card"
@@ -195,7 +198,7 @@ export function SkillsPanel() {
       aria-label={t("aria.skills")}
       data-show-mark
     >
-      <p className="panel-label">{t("nav.skills")}</p>
+      <p className="panel-label" data-motion="mobile-enter">{t("nav.skills")}</p>
       <div className="skills__grid" data-scroll-y>
         {profile.skills.map((group) => (
           <div className="skills__group" data-motion="enter" key={group.category}>
@@ -226,7 +229,7 @@ export function SkillsPanel() {
 export function ContactPanel() {
   return (
     <section className="panel contact" id="contact" aria-label={t("aria.contact")} data-show-mark>
-      <p className="panel-label">{t("nav.contact")}</p>
+      <p className="panel-label" data-motion="mobile-enter">{t("nav.contact")}</p>
       <div className="contact__body" data-motion="enter">
         <h2>{profile.identity.fullName}</h2>
         <p className="contact__location">{profile.identity.location}</p>
@@ -248,7 +251,7 @@ export function ContactPanel() {
           {t("contact.cv")}
         </a>
         <ul className="contact__links">
-          {profile.links.map((link) => (
+          {contactLinks.map((link) => (
             <li key={link.url}>
               <a href={link.url} target="_blank" rel="me noreferrer noopener">
                 {link.label}
