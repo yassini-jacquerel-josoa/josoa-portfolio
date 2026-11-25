@@ -17,12 +17,15 @@ vi.mock("../components/FontMorph.tsx", () => ({
 
 describe("<App />", () => {
   let desktop = false;
+  let mobile = false;
 
   beforeEach(() => {
     desktop = false;
+    mobile = false;
     vi.mocked(createDesktopScroll).mockReset();
     window.matchMedia = vi.fn().mockImplementation((query) => ({
-      matches: desktop && query === "(min-width: 1041px)",
+      matches: (desktop && query === "(min-width: 1041px)") ||
+        (mobile && query === "(max-width: 767px)"),
       media: query,
       onchange: null,
       addListener: vi.fn(),
@@ -71,7 +74,7 @@ describe("<App />", () => {
     expect(destroy).toHaveBeenCalledOnce();
   });
 
-  it("convertit directement la molette verticale en déplacement horizontal sur mobile", () => {
+  it("convertit directement la molette verticale en déplacement horizontal sur tablette", () => {
     vi.spyOn(Element.prototype, "scrollWidth", "get").mockReturnValue(4000);
     vi.spyOn(Element.prototype, "clientWidth", "get").mockReturnValue(1200);
     const { unmount } = render(<App />);
@@ -84,6 +87,39 @@ describe("<App />", () => {
       expect(scroller.scrollLeft).toBe(76.8);
     } finally {
       unmount();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("laisse le défilement natif sur mobile et positionne les ancres dans la hauteur", () => {
+    mobile = true;
+    const initialUrl = window.location.href;
+    vi.spyOn(Element.prototype, "scrollHeight", "get").mockReturnValue(4200);
+    vi.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(800);
+    const { unmount } = render(<App />);
+
+    try {
+      const scroller = screen.getByLabelText("Parcours vertical");
+      const projects = screen.getByRole("region", { name: "Projets" });
+      vi.spyOn(projects, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 1600, 390, 600));
+      const wheel = new WheelEvent("wheel", { deltaY: 120, cancelable: true });
+      expect(scroller.dispatchEvent(wheel)).toBe(true);
+      fireEvent.touchStart(scroller, { touches: [{ clientX: 80, clientY: 200 }] });
+      expect(fireEvent.touchMove(scroller, { touches: [{ clientX: 80, clientY: 80 }] })).toBe(true);
+      expect(scroller).toHaveClass("top-scroller--intro");
+      scroller.scrollTop = 50;
+      fireEvent.scroll(scroller);
+      expect(scroller).not.toHaveClass("top-scroller--intro");
+      scroller.scrollTop = 0;
+
+      fireEvent.click(screen.getByRole("link", { name: "Projets" }));
+      expect(window.location.hash).toBe("#projets");
+      expect(scroller.scrollTop).toBe(1600);
+      expect(scroller.scrollLeft).toBe(0);
+      expect(projects).toHaveFocus();
+    } finally {
+      unmount();
+      window.history.replaceState(null, "", initialUrl);
       vi.restoreAllMocks();
     }
   });
