@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { flushSync } from "react-dom";
 import { animate, stagger } from "animejs";
 import { createDesktopScroll } from "./animations/desktopScroll";
+import { MOBILE_SCROLL } from "./animations/scrollLayout";
 import { useScrollMotion } from "./animations/useScrollMotion";
 import PanelChrome from "./components/PanelChrome";
 import {
@@ -27,7 +28,7 @@ const SCROLL_SPEED = 0.64;
 function App() {
   const [introPlaying, setIntroPlaying] = useState(() =>
     !window.location.hash &&
-    window.matchMedia(DESKTOP).matches &&
+    (window.matchMedia(DESKTOP).matches || window.matchMedia(MOBILE_SCROLL).matches) &&
     !window.matchMedia(REDUCED_MOTION).matches,
   );
   const introPlayingRef = useRef(introPlaying);
@@ -39,6 +40,7 @@ function App() {
   };
 
   const [markVisible, setMarkVisible] = useState(false);
+  const [mobileLayout, setMobileLayout] = useState(() => window.matchMedia(MOBILE_SCROLL).matches);
   const [scrollHint, setScrollHint] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const scrollStageRef = useRef<HTMLDivElement>(null);
@@ -53,6 +55,7 @@ function App() {
     if (!el) return;
 
     const desktopMotion = window.matchMedia(DESKTOP);
+    const mobileScroll = window.matchMedia(MOBILE_SCROLL);
     const reduced = window.matchMedia(REDUCED_MOTION);
     const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
@@ -84,6 +87,10 @@ function App() {
     let titleEntranceProgress = 0;
 
     const measureRail = () => {
+      if (mobileScroll.matches) {
+        scrollLimit = Math.max(0, el.scrollHeight - el.clientHeight);
+        return;
+      }
       viewportWidth = el.clientWidth;
       scrollLimit = Math.max(0, el.scrollWidth - viewportWidth);
       desktopScroll?.resize(scrollLimit, viewportWidth, el.scrollLeft);
@@ -106,7 +113,7 @@ function App() {
     };
 
     const syncOpening = (left: number) => {
-      if (!portrait || reduced.matches) return;
+      if (!portrait || reduced.matches || mobileScroll.matches) return;
       if (desktopMotion.matches && portraitWidth > 0) {
         // Raccord entre le portrait à 1/5 de la vitesse du Hero et la piste à pleine vitesse.
         const offset = left - portraitWidth * 0.625;
@@ -156,7 +163,7 @@ function App() {
     };
 
     const measureOpening = () => {
-      if (!portrait || !hero) return;
+      if (!portrait || !hero || mobileScroll.matches) return;
       const width = portrait.getBoundingClientRect().width;
       portraitWidth = width;
       const heroWidth = hero.offsetWidth;
@@ -189,9 +196,11 @@ function App() {
 
     const positionOf = (section: HTMLElement) => {
       if (section === el) return 0;
-      const left =
-        section.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft;
-      return clamp(left);
+      const bounds = section.getBoundingClientRect();
+      const viewport = el.getBoundingClientRect();
+      return clamp(mobileScroll.matches
+        ? bounds.top - viewport.top + el.scrollTop
+        : bounds.left - viewport.left + el.scrollLeft);
     };
 
     const renderHorizontal = (next: number) => {
@@ -201,7 +210,8 @@ function App() {
     };
 
     const jumpTo = (next: number) => {
-      if (desktopScroll) desktopScroll.jumpTo(next);
+      if (mobileScroll.matches) el.scrollTop = next;
+      else if (desktopScroll) desktopScroll.jumpTo(next);
       else renderHorizontal(next);
     };
     jumpToRef.current = (left) => jumpTo(clamp(left));
@@ -233,7 +243,7 @@ function App() {
         titleEntrance = null;
         titleEntranceProgress = 0;
         measureRail();
-        renderHorizontal(clamp(left));
+        if (!mobileScroll.matches) renderHorizontal(clamp(left));
       }
     };
 
@@ -271,7 +281,7 @@ function App() {
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (desktopScroll || event.ctrlKey || event.shiftKey || !event.cancelable) return;
+      if (mobileScroll.matches || desktopScroll || event.ctrlKey || event.shiftKey || !event.cancelable) return;
       if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
       const delta = event.deltaY;
       const region = (event.target as Element | null)?.closest?.("[data-scroll-y], .nav");
@@ -303,7 +313,7 @@ function App() {
       event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
 
     const onNavPointerDown = (event: PointerEvent) => {
-      if (event.button !== 0 || hasModifiers(event)) return;
+      if (mobileScroll.matches || event.button !== 0 || hasModifiers(event)) return;
       const match = hashLinkFrom(event);
       if (!match) return;
       // Le lien du menu vit dans le hero. S'il prend le focus, le navigateur
@@ -348,7 +358,7 @@ function App() {
       updateScrollDriver();
       measureRail();
       measureOpening();
-      if (!desktopMotion.matches) skipIntro();
+      if (!desktopMotion.matches && !mobileScroll.matches) skipIntro();
     };
 
     const onMotionChange = () => {
@@ -357,13 +367,17 @@ function App() {
     };
 
     const onScroll = () => {
+      if (mobileScroll.matches) {
+        if (el.scrollTop > 0) skipIntro();
+        return;
+      }
       const left = el.scrollLeft;
       // Le rendu de bureau a déjà appliqué la position fractionnaire. Un écart
       // supérieur à l'arrondi du navigateur signale un déplacement natif (focus).
       if (!desktopScroll || Math.abs(left - projectedLeft) > 1) syncOpening(left);
     };
 
-    // Au téléphone, un glissement vertical continue le parcours horizontal.
+    // Sur tablette, un glissement vertical continue le parcours horizontal.
     type TouchDrag = { x: number; y: number; lastY: number; left: number; axis: "x" | "y" | null };
     let drag: TouchDrag | null = null;
 
@@ -375,13 +389,13 @@ function App() {
     };
 
     const onTouchStart = (event: TouchEvent) => {
-      if (desktopMotion.matches || event.touches.length !== 1) return;
+      if (mobileScroll.matches || desktopMotion.matches || event.touches.length !== 1) return;
       const touch = event.touches[0];
       drag = { x: touch.clientX, y: touch.clientY, lastY: touch.clientY, left: el.scrollLeft, axis: null };
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (!drag || event.touches.length !== 1) return;
+      if (mobileScroll.matches || !drag || event.touches.length !== 1) return;
       const touch = event.touches[0];
       const dx = touch.clientX - drag.x;
       const dy = touch.clientY - drag.lastY;
@@ -403,21 +417,51 @@ function App() {
       drag = null;
     };
 
+    const removeHorizontalGestures = () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+
+    const updateHorizontalGestures = () => {
+      if (mobileScroll.matches) {
+        removeHorizontalGestures();
+        return;
+      }
+      el.addEventListener("wheel", onWheel, { passive: false });
+      el.addEventListener("touchstart", onTouchStart, { passive: true });
+      el.addEventListener("touchmove", onTouchMove, { passive: false });
+      el.addEventListener("touchend", onTouchEnd);
+      el.addEventListener("touchcancel", onTouchEnd);
+    };
+
+    const onLayoutChange = () => {
+      drag = null;
+      pointerStartedOnHash = false;
+      skipIntro();
+      setMobileLayout(mobileScroll.matches);
+      updateHorizontalGestures();
+      if (mobileScroll.matches) el.scrollLeft = 0;
+      else el.scrollTop = 0;
+      onResize();
+      const section = location.hash ? sectionFromHash(location.hash) : null;
+      if (section) jumpTo(positionOf(section));
+    };
+
     el.addEventListener("focusin", skipIntro);
     document.addEventListener("keydown", onKeyDown, true);
-    el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("pointerdown", onNavPointerDown);
     el.addEventListener("pointerup", onNavPointerUp);
     el.addEventListener("click", onNavClick);
     el.addEventListener("scroll", onScroll, { passive: true });
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd);
-    el.addEventListener("touchcancel", onTouchEnd);
+    updateHorizontalGestures();
     window.addEventListener("popstate", onLocationChange);
     window.addEventListener("hashchange", onLocationChange);
     window.addEventListener("resize", onResize);
     reduced.addEventListener("change", onMotionChange);
+    mobileScroll.addEventListener("change", onLayoutChange);
 
     updateScrollDriver();
     measureRail();
@@ -436,7 +480,7 @@ function App() {
       galleryPanel.querySelectorAll("img").forEach((image) => {
         void image.decode?.().catch(() => {});
       });
-    }, { root: el, rootMargin: "0px 100%" });
+    }, { root: el, rootMargin: "100%" });
     if (galleryPanel) galleryObserver?.observe(galleryPanel);
 
     const initialSection = location.hash ? sectionFromHash(location.hash) : null;
@@ -446,19 +490,16 @@ function App() {
       jumpToRef.current = null;
       el.removeEventListener("focusin", skipIntro);
       document.removeEventListener("keydown", onKeyDown, true);
-      el.removeEventListener("wheel", onWheel);
       el.removeEventListener("pointerdown", onNavPointerDown);
       el.removeEventListener("pointerup", onNavPointerUp);
       el.removeEventListener("click", onNavClick);
       el.removeEventListener("scroll", onScroll);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
+      removeHorizontalGestures();
       window.removeEventListener("popstate", onLocationChange);
       window.removeEventListener("hashchange", onLocationChange);
       window.removeEventListener("resize", onResize);
       reduced.removeEventListener("change", onMotionChange);
+      mobileScroll.removeEventListener("change", onLayoutChange);
       window.clearTimeout(pointerTimer);
       railObserver?.disconnect();
       galleryObserver?.disconnect();
@@ -481,6 +522,7 @@ function App() {
     let idle = 0;
 
     const moreToCome = () => {
+      if (mobileLayout) return el.scrollTop < 24 && el.scrollHeight - el.clientHeight > 24;
       const max = el.scrollWidth - el.clientWidth;
       return max > 24 && el.scrollLeft < max - 24;
     };
@@ -516,14 +558,14 @@ function App() {
       window.removeEventListener("resize", arm);
       setScrollHint(false);
     };
-  }, [introPlaying]);
+  }, [introPlaying, mobileLayout]);
 
-  // Chrome fixe (JOSOA + jac. YASSINI) dès la section about
+  // Sur mobile, la signature fixe prend le relais lorsque le logo sort du cadre.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
-    const nodes = [...scroller.querySelectorAll<HTMLElement>("[data-show-mark]")];
+    const nodes = scroller.querySelectorAll<HTMLElement>(mobileLayout ? ".hero .brand" : "[data-show-mark]");
     const visible = new Set<Element>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -531,14 +573,14 @@ function App() {
           if (entry.isIntersecting) visible.add(entry.target);
           else visible.delete(entry.target);
         }
-        setMarkVisible(visible.size > 0);
+        setMarkVisible(mobileLayout ? visible.size === 0 : visible.size > 0);
       },
-      { root: scroller, threshold: 0.28 },
+      { root: scroller, threshold: mobileLayout ? 0 : 0.28 },
     );
 
     for (const node of nodes) observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [mobileLayout]);
 
   return (
     <div className="scroll-stage" ref={scrollStageRef}>
@@ -555,7 +597,8 @@ function App() {
               className={`top-scroller${introPlaying ? " top-scroller--intro" : ""}`}
               ref={scrollerRef}
               id="top"
-              aria-label={t("aria.scroller")}
+              aria-label={t(mobileLayout ? "aria.mobileScroller" : "aria.scroller")}
+              tabIndex={mobileLayout ? 0 : undefined}
             >
               <div
                 className="top-track"

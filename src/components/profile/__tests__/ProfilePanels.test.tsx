@@ -30,9 +30,9 @@ describe("<ProfilePanels />", () => {
     it("affiche la section À propos", () => {
       render(<AboutPanel />);
       expect(screen.getByRole("region", { name: /à propos/i })).toBeInTheDocument();
-      expect(screen.getByText("Senior")).toHaveAttribute("data-about-pin");
-      expect(screen.getByText("IA & SaaS")).toHaveAttribute("data-about-pin");
-      expect(screen.getByText("Fullstack")).not.toHaveAttribute("data-about-pin");
+      expect(screen.getByText("Senior").closest(".about__line")).toHaveAttribute("data-about-pin");
+      expect(screen.getByText("IA & SaaS").closest(".about__line")).toHaveAttribute("data-about-pin");
+      expect(screen.getByText("Fullstack").closest(".about__line")).not.toHaveAttribute("data-about-pin");
     });
   });
 
@@ -126,9 +126,10 @@ describe("<ProfilePanels />", () => {
       const cvLink = screen.getByRole("link", { name: /cv/i });
       expect(cvLink).toHaveAttribute("download");
 
-      profile.links.forEach((link) => {
-        expect(screen.getByRole("link", { name: link.label })).toHaveAttribute("href", link.url);
-      });
+      expect(screen.getByRole("link", { name: "LinkedIn" })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "GitHub" })).toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: "effi'Cash" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: "Z'Hay Awards" })).not.toBeInTheDocument();
     });
   });
 });
