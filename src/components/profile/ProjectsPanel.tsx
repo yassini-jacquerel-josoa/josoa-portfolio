@@ -1,5 +1,6 @@
-import { useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 import { createPortal, flushSync } from "react-dom";
+import { MOBILE_SCROLL } from "../../animations/scrollLayout.ts";
 import { useProjectsMotion } from "../../animations/useProjectsMotion.ts";
 import { orderedProjects, profile, projectStatusLabel } from "../../data/profile.ts";
 import type { Project } from "../../data/profile.schema.ts";
@@ -45,6 +46,25 @@ export default function ProjectsPanel({
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   useProjectsMotion(sectionRef, scrollToProject);
 
+  const closeWithTransition = (event: SyntheticEvent) => {
+    const dialog = dialogRef.current;
+    if (!dialog?.open) return;
+    if (dialog.hasAttribute("data-closing")) {
+      event.preventDefault();
+      return;
+    }
+    if (!window.matchMedia(MOBILE_SCROLL).matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !dialog.getAnimations) return;
+
+    event.preventDefault();
+    dialog.setAttribute("data-closing", "");
+    void Promise.allSettled(dialog.getAnimations().map((animation) => animation.finished)).then(() => {
+      if (dialogRef.current === dialog && dialog.open) dialog.close();
+      dialog.removeAttribute("data-closing");
+    });
+  };
+
   return (
     <section
       className="panel projects-showcase"
@@ -52,7 +72,7 @@ export default function ProjectsPanel({
       aria-labelledby="projects-title"
       ref={sectionRef}
     >
-      <div className="projects-showcase__intro" data-show-mark>
+      <div className="projects-showcase__intro" data-show-mark data-motion="mobile-enter">
         <h2 id="projects-title">{t("nav.projects")}</h2>
         <p className="projects-showcase__intro-hint">{t("projects.selectionsHint")}</p>
       </div>
@@ -107,8 +127,9 @@ export default function ProjectsPanel({
           id={detailsId}
           ref={dialogRef}
           aria-labelledby="project-details-title"
+          onCancel={closeWithTransition}
         >
-          <form method="dialog" className="project-details__actions">
+          <form method="dialog" className="project-details__actions" onSubmit={closeWithTransition}>
             <button className="project-details__pill" autoFocus>{t("projects.close")}</button>
           </form>
           {selectedProject && (
