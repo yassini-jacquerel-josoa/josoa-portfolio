@@ -55,6 +55,15 @@ describe("<ProfilePanels />", () => {
   });
 
   describe("<ProjectsPanel />", () => {
+    it("expose le nombre de projets pour dimensionner la section", () => {
+      render(<ProjectsPanel />);
+
+      const section = screen.getByRole("region", { name: /projets/i });
+      expect(section.style.getPropertyValue("--project-count")).toBe(
+        String(profile.projects.length),
+      );
+    });
+
     it("affiche les titres des projets et des liens externes sécurisés", () => {
       render(<ProjectsPanel />);
 

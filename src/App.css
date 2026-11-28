@@ -845,14 +845,21 @@
 
 /* ——— 7. Projets ——— */
 .projects-showcase {
+  --project-intro-width: 12.5vw;
+  --project-slot-width: 60vw;
   display: flex;
+  flex: 0 0 auto;
+  /* Largeur explicite : le calcul intrinsèque de la section peut se réduire
+     au seul panneau d’introduction selon le moteur de rendu, ce qui rognait
+     toutes les cartes via overflow: clip. */
+  width: calc(var(--project-intro-width) + var(--project-count, 5) * var(--project-slot-width));
   overflow: clip;
   background: var(--paper);
 }
 
 .projects-showcase__intro {
   display: grid;
-  flex: 0 0 12.5vw;
+  flex: 0 0 var(--project-intro-width);
   align-items: center;
   padding-inline: clamp(1rem, 2vw, 2rem);
 }
@@ -889,7 +896,7 @@
 
 .project-card-slot {
   position: relative;
-  flex: 0 0 60vw;
+  flex: 0 0 var(--project-slot-width);
   --project-open: 1;
   --project-media-open: 66%;
   --project-media-preview: 87%;
@@ -1618,7 +1625,6 @@
   }
 
   .projects-showcase__intro {
-    flex-basis: 2.05rem;
     justify-items: center;
     padding: 0;
   }
@@ -1630,8 +1636,12 @@
     rotate: 180deg;
   }
 
+  .projects-showcase {
+    --project-intro-width: 2.05rem;
+    --project-slot-width: min(84vw, 36rem);
+  }
+
   .project-card-slot {
-    flex-basis: min(84vw, 36rem);
     --project-media-open: 62%;
     --project-media-preview: 85%;
   }
@@ -1862,6 +1872,7 @@
   .projects-showcase,
   .record-row {
     display: grid;
+    width: 100%;
     gap: 0.85rem;
     padding: var(--mobile-section-space) var(--mobile-gutter);
   }
