@@ -71,6 +71,7 @@ export default function ProjectsPanel({
       id="projets"
       aria-labelledby="projects-title"
       ref={sectionRef}
+      style={{ "--project-count": projects.length } as CSSProperties}
     >
       <div className="projects-showcase__intro" data-show-mark data-motion="mobile-enter">
         <h2 id="projects-title">{t("nav.projects")}</h2>
